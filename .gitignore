@@ -1,0 +1,27 @@
+### Java / Maven
+target/
+*.log
+*.tmp
+*.swp
+.mvn/wrapper/maven-wrapper.jar
+
+### Node / Vite frontends
+node_modules/
+dist/
+.vite/
+
+### Environment & secrets
+.env
+.env.*
+!.env.example
+
+### IDE / Editor
+.idea/
+.vscode/
+*.iml
+*.classpath
+*.project
+.DS_Store
+
+### OS files
+Thumbs.db
