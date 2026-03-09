@@ -19,6 +19,9 @@ You can use this as talking points when presenting to your teacher.
   - ADMINs get extra dashboards and management features.
 - Protected routes on the frontend
   - Some pages (like the admin dashboard) are only accessible when logged in.
+ - Hardcoded demo accounts (always available in any environment):
+   - ADMIN: email `admin@gmail.com`, password `admin@123`
+   - USER: email `user@gmail.com`, password `user@123`
 
 ----------------------------------------------------------------------
 2. Amendments & Participation Layer

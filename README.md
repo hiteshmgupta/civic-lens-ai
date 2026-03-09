@@ -28,7 +28,38 @@ The backend is a Spring Boot API, and the frontend is a React + Vite SPA.
 
 ---
 
-## Backend – running locally
+## Quick demo logins & sample data
+
+- **Hardcoded demo accounts (always available in any environment)**:
+  - ADMIN: email `admin@gmail.com`, password `admin@123`
+  - USER: email `user@gmail.com`, password `user@123`
+- On first run (when there are no amendments), the backend seeds a few realistic
+  amendments and comments so the dashboards and analytics have data to show.
+
+---
+
+## Backend – deployed (Render)
+
+For your demo, the backend is already deployed to Render.
+
+Current backend URL:
+
+- `https://civiclens-backend-j5q2.onrender.com`
+
+It is connected to a managed PostgreSQL instance on Render using environment variables:
+
+- `DATABASE_URL` – JDBC URL to the Render Postgres database
+- `DB_USERNAME` – database username
+- `DB_PASSWORD` – database password
+- `JWT_SECRET` – secret key for signing JWTs
+- `AI_SERVICE_URL` – URL for the external AI service (or a placeholder)
+- `PORT` – set to `8080`
+
+You normally do **not** need to start the backend yourself for the presentation; just use the Render URL.
+
+### (Optional) Running the backend locally
+
+If you want to run the backend on your own machine (instead of Render):
 
 From the `civiclens-backend` folder:
 
@@ -42,30 +73,13 @@ mvn spring-boot:run
 # java -jar target/civiclens-backend-0.1.0.jar
 ```
 
-### Database configuration (PostgreSQL)
-
-The backend expects a PostgreSQL database. Default connection (from `application.yml`):
+For local runs the default DB settings are (from `application.yml`):
 
 - URL: `jdbc:postgresql://localhost:5432/civiclens`
 - Username: `postgres`
 - Password: `postgres`
 
-You can override these with environment variables:
-
-- `DATABASE_URL` – full JDBC URL (overrides all)
-- `DB_USERNAME` – database username
-- `DB_PASSWORD` – database password
-
-**If registration or login fails:**  
-Most often the backend is not fully started because the database connection failed.  
-Check the backend logs for a line like:
-
-- `FATAL: password authentication failed for user "postgres"`
-
-If you see this, either:
-
-1. Change your local PostgreSQL user/password to match the defaults, **or**
-2. Keep your existing credentials and set environment variables before starting:
+Override them if needed:
 
 ```bash
 set DB_USERNAME=your_user
@@ -76,20 +90,13 @@ set DATABASE_URL=jdbc:postgresql://localhost:5432/your_db
 mvn spring-boot:run
 ```
 
-Once the API is up (on `http://localhost:8080`), the `/api/auth/register` and `/api/auth/login` endpoints will work from the frontend.
-
-### Other backend settings
-
-These can also be overridden via environment variables:
-
-- `JWT_SECRET` – secret key for signing JWTs (default is a development value; change in production)
-- `AI_SERVICE_URL` – URL for the external AI service (default `http://localhost:8000`)
-
 ---
 
-## Frontend – running locally
+## Frontend – running locally (two modes)
 
-From the `civiclens-frontend` folder:
+### Mode 1 – Frontend + local backend (dev)
+
+From the `civiclens-frontend` folder (when backend is on `http://localhost:8080`):
 
 ```bash
 # 1. Install dependencies
@@ -100,6 +107,19 @@ npm run dev
 ```
 
 By default Vite runs on `http://localhost:5173`.
+
+### Mode 2 – Frontend local, backend on Render (recommended for demo)
+
+From the `civiclens-frontend` folder:
+
+```bash
+cd civiclens-frontend
+echo VITE_API_URL=https://civiclens-backend-j5q2.onrender.com > .env.development.local
+npm install
+npm run dev
+```
+
+Now all API calls go to your deployed backend on Render.
 
 ### API calls & auth
 
