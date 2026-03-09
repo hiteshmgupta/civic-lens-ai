@@ -1,0 +1,150 @@
+PROJECT: CivicLens – AI‑Powered Legislative Consultation Intelligence Platform
+======================================================================
+
+This document lists the main features and “cool things” our project can do.
+You can use this as talking points when presenting to your teacher.
+
+----------------------------------------------------------------------
+1. User Accounts & Security
+----------------------------------------------------------------------
+- Email‑based registration and login with validation
+  - Users sign up with username, email, and password.
+  - Passwords are NOT stored in plain text – they are hashed securely with BCrypt.
+- JWT‑based authentication
+  - After login/registration, the backend returns a signed JWT token.
+  - The frontend stores the token and automatically sends it with each API request.
+- Role‑based access control
+  - Two main roles: USER and ADMIN.
+  - Public users can read amendments and participate (comments, votes).
+  - ADMINs get extra dashboards and management features.
+- Protected routes on the frontend
+  - Some pages (like the admin dashboard) are only accessible when logged in.
+
+----------------------------------------------------------------------
+2. Amendments & Participation Layer
+----------------------------------------------------------------------
+- Amendment management (the “bills” we analyze)
+  - List of amendments with filters (category, status, sorting).
+  - Detailed view for each amendment with full text and metadata.
+  - Admins can create and edit amendments via a dedicated form.
+- Public participation
+  - Users can up‑vote or down‑vote each amendment.
+  - Users can post comments on amendments.
+  - Comment section shows live discussion under each amendment.
+- Status and categories
+  - Amendments have categories and statuses (e.g., active, closed) to structure the debate.
+
+----------------------------------------------------------------------
+3. AI‑Powered Sentiment & Argument Analysis
+----------------------------------------------------------------------
+- Transformer‑based sentiment model
+  - Uses a modern HuggingFace model (`cardiffnlp/twitter-roberta-base-sentiment-latest`).
+  - Analyzes public comments and amendment text.
+  - Outputs sentiment scores in a continuous range [-1, 1] (negative → positive).
+- Sentiment distribution and statistics
+  - Counts how many comments are positive, negative, or neutral.
+  - Computes sentiment mean and variance to see overall mood and disagreement.
+- Topic and argument extraction
+  - Groups comments into topic clusters (what themes people talk about).
+  - Extracts top supporting arguments and top opposing arguments.
+- Time‑based sentiment evolution
+  - Builds a sentiment timeline to show how opinion changes over time.
+
+----------------------------------------------------------------------
+4. Controversy & Engagement Analytics
+----------------------------------------------------------------------
+- Controversy score for each amendment
+  - Combines many signals into one “controversy index”:
+    - Sentiment variance (how divided people are emotionally).
+    - Vote polarity (balance of up‑votes vs down‑votes).
+    - Stance entropy (how evenly split the audience is across stances).
+    - Engagement intensity (how many people are commenting compared to others).
+  - Produces a numeric controversy score and a human‑readable label
+    (e.g., low, medium, high controversy).
+- Engagement metrics
+  - Total number of comments.
+  - Total number of votes, up‑votes, and down‑votes.
+  - Comparison across amendments to spot which proposals attract attention.
+- AI‑generated policy brief
+  - Summarizes the public feedback and main arguments into a policy brief.
+  - Helps decision‑makers quickly understand what citizens are saying.
+
+----------------------------------------------------------------------
+5. Admin Intelligence Dashboard
+----------------------------------------------------------------------
+- High‑level overview cards
+  - Total amendments.
+  - Active amendments.
+  - Total comments.
+  - Total votes.
+- Global sentiment and participation charts
+  - Global sentiment overview: shows how positive/negative the overall debate is.
+  - Participation trend: how citizen engagement evolves over time.
+- “Most Controversial” list
+  - Highlights the amendments with the highest controversy score.
+  - Helps admins quickly see which topics need more attention or communication.
+- Amendment creation & management
+  - Admins can create new amendments directly from the dashboard.
+  - After creating, the dashboard refreshes so they can see impact.
+
+----------------------------------------------------------------------
+6. Citizen‑Facing Frontend Experience
+----------------------------------------------------------------------
+- Modern, responsive UI built with React + Vite + Tailwind
+  - Clean, card‑based layouts and “glass” effect components.
+  - Dark theme design suitable for dashboard‑style data.
+- Navigation and pages
+  - Home page listing active amendments.
+  - Amendment detail page with:
+    - Full text and category badges.
+    - Voting controls (support/oppose).
+    - Comment section.
+    - Sentiment indicator and countdown timer for open consultations.
+  - Authentication pages:
+    - Login page.
+    - Registration page.
+  - Admin dashboard page for advanced analytics and management.
+- Visual indicators and badges
+  - Category badges for types of amendments.
+  - Sentiment indicator components (e.g., color or icon based on positivity).
+  - Stat cards with icons for quick scanning (comments, votes, amendments, etc.).
+
+----------------------------------------------------------------------
+7. Reporting & PDF Export
+----------------------------------------------------------------------
+- PDF report generation on the backend
+  - Uses OpenHTMLtoPDF + PDFBox to render styled HTML into PDFs.
+  - Can be used to export summaries of amendments, feedback, and analytics.
+- Suitable for decision‑makers and offline sharing
+  - Reports can be attached to emails or stored as documentation.
+
+----------------------------------------------------------------------
+8. Architecture & Integration Highlights
+----------------------------------------------------------------------
+- Three main components
+  1. **Backend API (Spring Boot)** – exposes REST endpoints for auth, amendments,
+     comments, votes, analytics, and admin dashboard data.
+  2. **AI Service (Python)** – sentiment and topic model using transformers,
+     called from the backend via HTTP.
+  3. **Frontend SPA (React)** – interactive web app for citizens and admins.
+- Clean layering
+  - Entities & repositories (database models).
+  - Services (business logic).
+  - Controllers (HTTP endpoints).
+  - DTOs (clean JSON responses to the frontend).
+- Security and CORS
+  - JWT and role checks in Spring Security.
+  - CORS configuration allows local dev from `localhost:5173`.
+
+----------------------------------------------------------------------
+9. Example “Pitch” Sentences for Presentation
+----------------------------------------------------------------------
+- “CivicLens is an AI‑powered platform that helps legislators understand public
+  feedback on proposed amendments.”
+- “We don’t just collect votes—we analyze sentiment, arguments, and engagement
+  to compute a controversy score for each amendment.”
+- “Admins get a live dashboard with global sentiment, participation trends, and
+  a list of the most controversial proposals.”
+- “Citizens get a modern web interface where they can read amendments, vote,
+  comment, and see how others feel about a proposal.”
+
