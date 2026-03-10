@@ -27,9 +27,21 @@ public class AnalyticsService {
     private final ControversyCalculator calculator;
 
     public AnalyticsResponse getAnalytics(Long amendmentId) {
-        AmendmentAnalytics analytics = analyticsRepository.findByAmendmentId(amendmentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Analytics not found for amendment: " + amendmentId));
-        return toResponse(analytics);
+        Optional<AmendmentAnalytics> analytics = analyticsRepository.findByAmendmentId(amendmentId);
+        if (analytics.isPresent()) {
+            return toResponse(analytics.get());
+        }
+        // Return default empty analytics so the frontend can show the "Generate Analysis" button
+        // instead of the error page when no analysis has been triggered yet
+        return AnalyticsResponse.builder()
+                .amendmentId(amendmentId)
+                .totalComments(0)
+                .totalVotes(0)
+                .upvotes(0)
+                .downvotes(0)
+                .controversyScore(0.0)
+                .controversyLabel("N/A")
+                .build();
     }
 
     @Transactional

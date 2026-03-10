@@ -19,12 +19,19 @@ The backend is a Spring Boot API, and the frontend is a React + Vite SPA.
   - React **18**
   - Vite **5**
 
+- **AI Service**
+  - Python **3.11+**
+  - FastAPI + Uvicorn
+  - HuggingFace Inference API (no local ML models)
+  - httpx (async HTTP client)
+
 ---
 
 ## Project structure
 
 - `civiclens-backend/` – Spring Boot REST API
 - `civiclens-frontend/` – React + Vite frontend
+- `civiclens-ai/` – Python AI microservice (HuggingFace Inference API)
 
 ---
 
@@ -89,6 +96,40 @@ set DATABASE_URL=jdbc:postgresql://localhost:5432/your_db
 
 mvn spring-boot:run
 ```
+
+---
+
+## AI Service
+
+The AI service is a lightweight Python FastAPI microservice that calls HuggingFace Inference API.
+No ML model downloads are needed — the service is ~200MB when containerized.
+
+### Running locally
+
+From the `civiclens-ai` folder:
+
+```bash
+# 1. Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # macOS/Linux
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Set your HuggingFace API token
+set HF_API_TOKEN=hf_your_token_here          # Windows
+# export HF_API_TOKEN=hf_your_token_here     # macOS/Linux
+
+# 4. Run the server
+python -m uvicorn main:app --port 8000
+```
+
+Health check: `http://localhost:8000/ai/health`
+
+### Deployed (Render)
+
+See the Render deployment section below for how to deploy the AI service alongside the backend.
 
 ---
 

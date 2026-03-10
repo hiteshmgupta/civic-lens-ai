@@ -2,6 +2,8 @@
 CivicLens AI Microservice — FastAPI application.
 Provides sentiment analysis, topic modeling, argument classification,
 summarization, and controversy index calculation.
+
+Uses HuggingFace Inference API — no local model downloads needed.
 """
 import logging
 import time
@@ -12,43 +14,31 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from schemas import AnalysisRequest, AnalysisResponse
 from services.analysis_pipeline import run_analysis
-from models import sentiment, topic, classifier, summarizer
 import config
+import hf_client
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s"
+    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
 )
 logger = logging.getLogger("civiclens-ai")
-
-models_loaded = False
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Pre-load models on startup."""
-    global models_loaded
-    logger.info("Pre-loading AI models...")
-    start = time.time()
-    try:
-        sentiment.load_model()
-        # Topic and classifier models are loaded lazily on first use
-        # to reduce startup time (they're heavy)
-        logger.info("Core models loaded in %.1fs", time.time() - start)
-        models_loaded = True
-    except Exception as e:
-        logger.error("Model loading failed: %s", str(e))
-        models_loaded = False
+    """Manage shared resources (httpx client) on startup/shutdown."""
+    logger.info("Starting CivicLens AI service (HF Inference API mode)")
     yield
-    logger.info("Shutting down AI service")
+    await hf_client.close_client()
+    logger.info("CivicLens AI service shut down")
 
 
 app = FastAPI(
     title="CivicLens AI Service",
-    description="AI-powered legislative consultation analysis",
-    version="0.1.0",
-    lifespan=lifespan
+    description="AI-powered legislative consultation analysis (HF Inference API)",
+    version="0.3.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -61,10 +51,13 @@ app.add_middleware(
 
 @app.get("/ai/health")
 async def health_check():
+    has_token = bool(config.HF_API_TOKEN)
     return {
-        "status": "healthy" if models_loaded else "degraded",
-        "models_loaded": models_loaded,
-        "service": "civiclens-ai"
+        "status": "healthy" if has_token else "degraded (no HF_API_TOKEN)",
+        "hf_api_token_set": has_token,
+        "service": "civiclens-ai",
+        "mode": "huggingface-inference-api",
+        "version": "0.3.0",
     }
 
 
@@ -75,16 +68,16 @@ async def analyze(request: AnalysisRequest):
     """
     logger.info(
         "Analysis request: amendment_id=%d, comments=%d",
-        request.amendment_id, len(request.comments)
+        request.amendment_id, len(request.comments),
     )
 
     start = time.time()
     try:
-        result = run_analysis(request.amendment_text, request.comments)
+        result = await run_analysis(request.amendment_text, request.comments)
         elapsed = time.time() - start
         logger.info(
             "Analysis completed in %.1fs for amendment %d",
-            elapsed, request.amendment_id
+            elapsed, request.amendment_id,
         )
         return AnalysisResponse(**result)
     except Exception as e:
@@ -94,10 +87,11 @@ async def analyze(request: AnalysisRequest):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "main:app",
         host=config.HOST,
         port=config.PORT,
         reload=True,
-        log_level="info"
+        log_level="info",
     )

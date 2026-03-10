@@ -1,27 +1,21 @@
 """
-Zero-shot argument classification: support / oppose / suggestion / neutral.
+Zero-shot argument classification using HuggingFace Inference API (async).
+Model: facebook/bart-large-mnli
+Categories: support / oppose / suggestion / neutral.
 """
 import logging
-from transformers import pipeline
-from config import ZERO_SHOT_MODEL, STANCE_LABELS, MODEL_CACHE_DIR
+from config import ZERO_SHOT_MODEL, STANCE_LABELS
+import hf_client
 
 logger = logging.getLogger(__name__)
 
-_classifier = None
-
 
 def load_model():
-    global _classifier
-    logger.info("Loading zero-shot classifier: %s", ZERO_SHOT_MODEL)
-    _classifier = pipeline(
-        "zero-shot-classification",
-        model=ZERO_SHOT_MODEL,
-        model_kwargs={"cache_dir": MODEL_CACHE_DIR} if MODEL_CACHE_DIR else {},
-    )
-    logger.info("Zero-shot classifier loaded successfully")
+    """No-op for API mode — kept for interface compatibility."""
+    logger.info("Using HF Inference API for classification: %s", ZERO_SHOT_MODEL)
 
 
-def classify(texts: list[str]) -> dict:
+async def classify(texts: list[str]) -> dict:
     """
     Classify each text into stance categories.
     Returns:
@@ -31,29 +25,26 @@ def classify(texts: list[str]) -> dict:
     if not texts:
         return {"stance_counts": {l: 0 for l in STANCE_LABELS}, "classified": []}
 
-    if _classifier is None:
-        load_model()
-
     stance_counts = {label: 0 for label in STANCE_LABELS}
     classified = []
 
-    batch_size = 16
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i:i + batch_size]
-        for text in batch:
-            try:
-                result = _classifier(
-                    text,
-                    candidate_labels=STANCE_LABELS,
-                    truncation=True
-                )
-                top_label = result["labels"][0]
-                stance_counts[top_label] += 1
-                classified.append((text, top_label))
-            except Exception as e:
-                logger.warning("Classification failed for text: %s", str(e))
-                stance_counts["neutral"] += 1
-                classified.append((text, "neutral"))
+    for text in texts:
+        try:
+            result = await hf_client.query(
+                ZERO_SHOT_MODEL,
+                {
+                    "inputs": text,
+                    "parameters": {"candidate_labels": STANCE_LABELS},
+                },
+            )
+
+            top_label = result["labels"][0]
+            stance_counts[top_label] += 1
+            classified.append((text, top_label))
+        except Exception as e:
+            logger.warning("Classification failed for text: %s", str(e))
+            stance_counts["neutral"] += 1
+            classified.append((text, "neutral"))
 
     return {"stance_counts": stance_counts, "classified": classified}
 

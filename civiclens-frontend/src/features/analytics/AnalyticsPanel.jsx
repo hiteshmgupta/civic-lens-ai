@@ -112,11 +112,11 @@ export default function AnalyticsPanel({ amendmentId }) {
           <div className="text-4xl mb-3">🔬</div>
           <h4 className="text-dark-200 font-semibold mb-2">No Analysis Available</h4>
           <p className="text-sm text-dark-400 mb-4">
-            Comments are needed before AI analysis can be generated.
+            Click below to run AI analysis on the existing comments.
           </p>
           {isAdmin && (
-            <button onClick={handleReanalyze} className="btn-primary text-sm">
-              Generate Analysis
+            <button onClick={handleReanalyze} disabled={analyzing} className="btn-primary text-sm">
+              {analyzing ? 'Analyzing...' : 'Generate Analysis'}
             </button>
           )}
         </div>

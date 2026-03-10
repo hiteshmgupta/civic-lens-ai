@@ -1,3 +1,25 @@
+### Python / AI Service
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+*.so
+
+# Virtual environments
+.venv*/
+.env-py*/
+venv/
+env/
+
+# AI model downloads (prevent accidental commit of large model files)
+models_cache/
+*.bin
+*.safetensors
+*.onnx
+*.pt
+*.pth
+
 ### Java / Maven
 target/
 *.log
@@ -21,7 +43,13 @@ dist/
 *.iml
 *.classpath
 *.project
-.DS_Store
 
 ### OS files
+.DS_Store
 Thumbs.db
+
+### Render / Deploy
+.render/
+
+### ngrok
+ngrok.exe
