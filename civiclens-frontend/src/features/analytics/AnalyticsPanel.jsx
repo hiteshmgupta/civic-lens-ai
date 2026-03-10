@@ -16,6 +16,7 @@ export default function AnalyticsPanel({ amendmentId }) {
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [error, setError] = useState(null)
 
   const fetchAnalytics = async () => {
     try {
@@ -34,11 +35,14 @@ export default function AnalyticsPanel({ amendmentId }) {
 
   const handleReanalyze = async () => {
     setAnalyzing(true)
+    setError(null)
     try {
       await triggerAnalysis(amendmentId)
       await fetchAnalytics()
     } catch (err) {
       console.error('Analysis trigger failed:', err)
+      const msg = err.response?.data?.message || err.response?.data?.detail || err.message || 'Analysis failed'
+      setError(`Analysis failed: ${msg} (HTTP ${err.response?.status || 'unknown'})`)
     } finally {
       setAnalyzing(false)
     }
@@ -118,6 +122,11 @@ export default function AnalyticsPanel({ amendmentId }) {
             <button onClick={handleReanalyze} disabled={analyzing} className="btn-primary text-sm">
               {analyzing ? 'Analyzing...' : 'Generate Analysis'}
             </button>
+          )}
+          {error && (
+            <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-left">
+              ⚠️ {error}
+            </div>
           )}
         </div>
       ) : (
