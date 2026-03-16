@@ -135,8 +135,8 @@ public class AmendmentService {
     }
 
     private AmendmentResponse toResponse(Amendment a) {
-        int up = voteRepository.countUpvotes(a.getId());
-        int down = voteRepository.countDownvotes(a.getId());
+        int up = voteRepository.countUpvotesByAmendmentId(a.getId());
+        int down = voteRepository.countDownvotesByAmendmentId(a.getId());
         int comments = commentRepository.countByAmendmentId(a.getId());
 
         AmendmentResponse.AmendmentResponseBuilder builder = AmendmentResponse.builder()

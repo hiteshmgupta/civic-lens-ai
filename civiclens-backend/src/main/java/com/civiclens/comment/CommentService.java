@@ -5,6 +5,7 @@ import com.civiclens.comment.dto.*;
 import com.civiclens.common.dto.PagedResponse;
 import com.civiclens.common.exception.ResourceNotFoundException;
 import com.civiclens.user.*;
+import com.civiclens.vote.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -22,6 +23,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final AmendmentRepository amendmentRepository;
     private final UserRepository userRepository;
+    private final VoteRepository voteRepository;
 
     @Transactional
     public CommentResponse create(Long amendmentId, CommentRequest request, String userEmail) {
@@ -66,10 +68,14 @@ public class CommentService {
     }
 
     private CommentResponse toResponse(Comment c) {
+        int up = voteRepository.countUpvotesByCommentId(c.getId());
+        int down = voteRepository.countDownvotesByCommentId(c.getId());
         return CommentResponse.builder()
                 .id(c.getId())
                 .body(c.getBody())
                 .username(c.getUser().getUsername())
+                .upvotes(up)
+                .downvotes(down)
                 .createdAt(c.getCreatedAt())
                 .build();
     }

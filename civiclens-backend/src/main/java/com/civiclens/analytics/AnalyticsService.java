@@ -64,8 +64,8 @@ public class AnalyticsService {
         AiAnalysisResponse aiResponse = aiServiceClient.analyze(aiRequest);
 
         // Calculate controversy index components
-        int upvotes = voteRepository.countUpvotes(amendmentId);
-        int downvotes = voteRepository.countDownvotes(amendmentId);
+        int upvotes = voteRepository.countUpvotesByAmendmentId(amendmentId);
+        int downvotes = voteRepository.countDownvotesByAmendmentId(amendmentId);
         int totalComments = comments.size();
         long maxComments = amendmentRepository.count() > 0 ? commentRepository.count() / amendmentRepository.count()
                 : 1;

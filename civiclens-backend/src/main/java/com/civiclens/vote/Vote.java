@@ -8,9 +8,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "votes", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"user_id", "amendment_id"})
+        @UniqueConstraint(columnNames = { "user_id", "amendment_id" })
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Vote {
 
     @Id
