@@ -5,6 +5,7 @@ import com.civiclens.comment.dto.*;
 import com.civiclens.common.dto.PagedResponse;
 import com.civiclens.common.exception.ResourceNotFoundException;
 import com.civiclens.user.*;
+import com.civiclens.vote.VoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,8 @@ class CommentServiceTest {
     private AmendmentRepository amendmentRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private VoteRepository voteRepository;
 
     @InjectMocks
     private CommentService commentService;

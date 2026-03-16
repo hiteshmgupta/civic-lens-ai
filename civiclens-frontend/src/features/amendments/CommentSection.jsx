@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getComments, addComment } from '../../api/commentApi'
 import { useAuth } from '../../context/AuthContext'
 import { formatDateTime } from '../../utils/constants'
+import VoteControls from './VoteControls'
 
 export default function CommentSection({ amendmentId, status }) {
   const { user } = useAuth()
@@ -123,18 +124,33 @@ export default function CommentSection({ amendmentId, status }) {
 function CommentItem({ comment }) {
   return (
     <div className="glass-card p-4 animate-slide-up">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-7 h-7 bg-dark-700 rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-xs font-semibold text-civic-400">
-            {comment.username?.charAt(0).toUpperCase() || '?'}
-          </span>
+      <div className="flex gap-3">
+        {/* Vote Controls */}
+        <div className="flex-shrink-0 pt-0.5">
+          <VoteControls
+            commentId={comment.id}
+            upvotes={comment.upvotes || 0}
+            downvotes={comment.downvotes || 0}
+            layout="vertical"
+          />
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-dark-200">{comment.username}</span>
-          <span className="text-xs text-dark-500">{formatDateTime(comment.createdAt)}</span>
+
+        {/* Comment Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-7 h-7 bg-dark-700 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-semibold text-civic-400">
+                {comment.username?.charAt(0).toUpperCase() || '?'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-dark-200">{comment.username}</span>
+              <span className="text-xs text-dark-500">{formatDateTime(comment.createdAt)}</span>
+            </div>
+          </div>
+          <p className="text-sm text-dark-300 leading-relaxed">{comment.body}</p>
         </div>
       </div>
-      <p className="text-sm text-dark-300 leading-relaxed pl-9">{comment.body}</p>
     </div>
   )
 }

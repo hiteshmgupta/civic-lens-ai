@@ -1,14 +1,14 @@
 package com.civiclens.vote;
 
-import com.civiclens.amendment.Amendment;
+import com.civiclens.comment.Comment;
 import com.civiclens.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "votes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "user_id", "amendment_id" })
+@Table(name = "comment_votes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "user_id", "comment_id" })
 })
 @Getter
 @Setter
@@ -26,8 +26,8 @@ public class Vote {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "amendment_id", nullable = false)
-    private Amendment amendment;
+    @JoinColumn(name = "comment_id", nullable = false)
+    private Comment comment;
 
     @Column(nullable = false)
     private short value; // -1 or +1

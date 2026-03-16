@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { vote as voteApi, removeVote } from '../../api/voteApi'
 import { useAuth } from '../../context/AuthContext'
 
-export default function VoteControls({ amendmentId, upvotes: initUp, downvotes: initDown, userVote: initVote, layout = 'vertical' }) {
+export default function VoteControls({ commentId, upvotes: initUp, downvotes: initDown, userVote: initVote, layout = 'horizontal' }) {
   const { user } = useAuth()
   const [upvotes, setUpvotes] = useState(initUp || 0)
   const [downvotes, setDownvotes] = useState(initDown || 0)
@@ -17,7 +17,7 @@ export default function VoteControls({ amendmentId, upvotes: initUp, downvotes: 
     try {
       if (userVote === value) {
         // Remove vote
-        await removeVote(amendmentId)
+        await removeVote(commentId)
         if (value === 1) setUpvotes(prev => prev - 1)
         else setDownvotes(prev => prev - 1)
         setUserVote(0)
@@ -25,7 +25,7 @@ export default function VoteControls({ amendmentId, upvotes: initUp, downvotes: 
         if (userVote === 1) setUpvotes(prev => prev - 1)
         else if (userVote === -1) setDownvotes(prev => prev - 1)
 
-        await voteApi(amendmentId, value)
+        await voteApi(commentId, value)
         if (value === 1) setUpvotes(prev => prev + 1)
         else setDownvotes(prev => prev + 1)
         setUserVote(value)
@@ -38,10 +38,10 @@ export default function VoteControls({ amendmentId, upvotes: initUp, downvotes: 
   }
 
   const net = upvotes - downvotes
-  const isHorizontal = layout === 'horizontal'
+  const isVertical = layout === 'vertical'
 
   return (
-    <div className={`flex items-center gap-1 ${isHorizontal ? 'flex-row' : 'flex-col'}`}>
+    <div className={`flex items-center gap-1 ${isVertical ? 'flex-col' : 'flex-row'}`}>
       {/* Upvote */}
       <button
         onClick={() => handleVote(1)}
@@ -53,13 +53,13 @@ export default function VoteControls({ amendmentId, upvotes: initUp, downvotes: 
         } disabled:opacity-40 disabled:cursor-not-allowed`}
         title={user ? 'Upvote' : 'Login to vote'}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 group-active:scale-90">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 group-active:scale-90">
           <path d="M12 19V5M5 12l7-7 7 7" />
         </svg>
       </button>
 
       {/* Score */}
-      <span className={`text-sm font-bold font-mono min-w-[2ch] text-center ${
+      <span className={`text-xs font-bold font-mono min-w-[2ch] text-center ${
         net > 0 ? 'text-civic-400' : net < 0 ? 'text-rose-400' : 'text-dark-400'
       }`}>
         {net > 0 ? `+${net}` : net}
@@ -76,7 +76,7 @@ export default function VoteControls({ amendmentId, upvotes: initUp, downvotes: 
         } disabled:opacity-40 disabled:cursor-not-allowed`}
         title={user ? 'Downvote' : 'Login to vote'}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 group-active:scale-90">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-200 group-active:scale-90">
           <path d="M12 5v14M19 12l-7 7-7-7" />
         </svg>
       </button>

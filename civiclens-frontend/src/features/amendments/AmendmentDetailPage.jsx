@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom'
 import { getAmendment } from '../../api/amendmentApi'
 import CategoryBadge from './CategoryBadge'
 import CountdownTimer from './CountdownTimer'
-import VoteControls from './VoteControls'
 import CommentSection from './CommentSection'
 import SentimentIndicator from './SentimentIndicator'
 import AnalyticsPanel from '../analytics/AnalyticsPanel'
@@ -56,58 +55,44 @@ export default function AmendmentDetailPage() {
         <div className="flex-1 min-w-0 space-y-6">
           {/* Amendment Header */}
           <div className="glass-card p-6">
-            <div className="flex items-start gap-4">
-              {/* Vote Controls */}
-              <div className="flex-shrink-0 pt-1">
-                <VoteControls
-                  amendmentId={amendment.id}
-                  upvotes={amendment.upvotes}
-                  downvotes={amendment.downvotes}
-                  layout="vertical"
-                />
-              </div>
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <CategoryBadge category={amendment.category} size="md" />
+              <span className={`badge ${
+                amendment.status === 'ACTIVE'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                  : 'bg-dark-700 text-dark-400 border border-dark-600'
+              }`}>
+                {amendment.status}
+              </span>
+              <SentimentIndicator score={amendment.sentimentMean} size="md" />
+            </div>
 
-              <div className="flex-1 min-w-0">
-                {/* Meta row */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <CategoryBadge category={amendment.category} size="md" />
-                  <span className={`badge ${
-                    amendment.status === 'ACTIVE'
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-                      : 'bg-dark-700 text-dark-400 border border-dark-600'
-                  }`}>
-                    {amendment.status}
+            {/* Title */}
+            <h1 className="text-2xl font-bold text-dark-50 mb-3 leading-tight">
+              {amendment.title}
+            </h1>
+
+            {/* Author + Date */}
+            <div className="flex items-center gap-3 text-sm text-dark-400 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-dark-700 rounded-full flex items-center justify-center">
+                  <span className="text-[10px] font-semibold text-civic-400">
+                    {amendment.createdByUsername?.charAt(0).toUpperCase()}
                   </span>
-                  <SentimentIndicator score={amendment.sentimentMean} size="md" />
                 </div>
+                <span>By <span className="text-dark-200">{amendment.createdByUsername}</span></span>
+              </div>
+              <span>•</span>
+              <span>{formatDateTime(amendment.createdAt)}</span>
+            </div>
 
-                {/* Title */}
-                <h1 className="text-2xl font-bold text-dark-50 mb-3 leading-tight">
-                  {amendment.title}
-                </h1>
-
-                {/* Author + Date */}
-                <div className="flex items-center gap-3 text-sm text-dark-400 mb-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-dark-700 rounded-full flex items-center justify-center">
-                      <span className="text-[10px] font-semibold text-civic-400">
-                        {amendment.createdByUsername?.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <span>By <span className="text-dark-200">{amendment.createdByUsername}</span></span>
-                  </div>
-                  <span>•</span>
-                  <span>{formatDateTime(amendment.createdAt)}</span>
-                </div>
-
-                {/* Body */}
-                <div className="prose prose-invert max-w-none">
-                  <div className="bg-dark-800/40 rounded-xl p-5 border border-dark-700/30">
-                    <p className="text-dark-200 leading-relaxed whitespace-pre-wrap text-sm">
-                      {amendment.body}
-                    </p>
-                  </div>
-                </div>
+            {/* Body */}
+            <div className="prose prose-invert max-w-none">
+              <div className="bg-dark-800/40 rounded-xl p-5 border border-dark-700/30">
+                <p className="text-dark-200 leading-relaxed whitespace-pre-wrap text-sm">
+                  {amendment.body}
+                </p>
               </div>
             </div>
           </div>

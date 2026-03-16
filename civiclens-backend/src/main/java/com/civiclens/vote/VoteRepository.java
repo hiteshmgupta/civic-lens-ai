@@ -8,13 +8,21 @@ import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, Long> {
 
-    Optional<Vote> findByUserIdAndAmendmentId(Long userId, Long amendmentId);
+    // Per-comment vote lookup (for casting / removing a vote)
+    Optional<Vote> findByUserIdAndCommentId(Long userId, Long commentId);
+    boolean existsByUserIdAndCommentId(Long userId, Long commentId);
 
-    @Query("SELECT COALESCE(SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.amendment.id = :amendmentId")
-    int countUpvotes(@Param("amendmentId") Long amendmentId);
+    // Per-comment vote counts
+    @Query("SELECT COALESCE(SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.id = :commentId")
+    int countUpvotesByCommentId(@Param("commentId") Long commentId);
 
-    @Query("SELECT COALESCE(SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.amendment.id = :amendmentId")
-    int countDownvotes(@Param("amendmentId") Long amendmentId);
+    @Query("SELECT COALESCE(SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.id = :commentId")
+    int countDownvotesByCommentId(@Param("commentId") Long commentId);
 
-    boolean existsByUserIdAndAmendmentId(Long userId, Long amendmentId);
+    // Per-amendment vote counts (aggregated through comments)
+    @Query("SELECT COALESCE(SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.amendment.id = :amendmentId")
+    int countUpvotesByAmendmentId(@Param("amendmentId") Long amendmentId);
+
+    @Query("SELECT COALESCE(SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.amendment.id = :amendmentId")
+    int countDownvotesByAmendmentId(@Param("amendmentId") Long amendmentId);
 }

@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/amendments/{amendmentId}/vote")
+@RequestMapping("/api/comments/{commentId}/vote")
 @RequiredArgsConstructor
 public class VoteController {
 
@@ -16,18 +16,18 @@ public class VoteController {
 
     @PostMapping
     public ResponseEntity<Void> vote(
-            @PathVariable Long amendmentId,
+            @PathVariable Long commentId,
             @Valid @RequestBody VoteRequest request,
             Authentication auth) {
-        voteService.vote(amendmentId, request, auth.getName());
+        voteService.vote(commentId, request, auth.getName());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> removeVote(
-            @PathVariable Long amendmentId,
+            @PathVariable Long commentId,
             Authentication auth) {
-        voteService.removeVote(amendmentId, auth.getName());
+        voteService.removeVote(commentId, auth.getName());
         return ResponseEntity.ok().build();
     }
 }

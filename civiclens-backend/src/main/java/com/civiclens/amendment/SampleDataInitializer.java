@@ -5,12 +5,20 @@ import com.civiclens.comment.CommentRepository;
 import com.civiclens.user.User;
 import com.civiclens.user.UserRepository;
 import com.civiclens.user.UserRole;
+import com.civiclens.vote.Vote;
+import com.civiclens.vote.VoteRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -20,102 +28,136 @@ public class SampleDataInitializer implements CommandLineRunner {
     private final AmendmentRepository amendmentRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final VoteRepository voteRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) {
         if (amendmentRepository.count() > 0) {
-            // Don't add sample data if there are already amendments in the DB
+            log.info("Database already has amendments — skipping data seeding.");
             return;
         }
 
-        // Use the hardcoded admin and user created by AdminUserInitializer
-        User admin = userRepository.findByEmail("admin@gmail.com")
-                .orElseThrow(() -> new IllegalStateException("Expected hardcoded admin user to exist"));
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            InputStream is = new ClassPathResource("fcc_dataset.json").getInputStream();
+            Map<String, Object> dataset = mapper.readValue(is, new TypeReference<>() {});
 
-        User user = userRepository.findByEmail("user@gmail.com")
-                .orElseThrow(() -> new IllegalStateException("Expected hardcoded user to exist"));
+            // 1. Create synthetic users
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> usersData = (List<Map<String, String>>) dataset.get("users");
+            List<User> users = new ArrayList<>();
+            for (Map<String, String> u : usersData) {
+                String email = u.get("email");
+                User user = userRepository.findByEmail(email).orElseGet(() -> {
+                    User newUser = User.builder()
+                            .username(u.get("username"))
+                            .email(email)
+                            .passwordHash(passwordEncoder.encode("civiclens@123"))
+                            .role(UserRole.USER)
+                            .build();
+                    return userRepository.save(newUser);
+                });
+                users.add(user);
+            }
+            log.info("Created/loaded {} synthetic users", users.size());
 
-        // Amendment 1 – Digital Privacy
-        Amendment privacy = Amendment.builder()
-                .title("Data Protection and Digital Privacy Amendment")
-                .body("""
-This amendment proposes stricter limits on how government agencies and private platforms
-can collect and store citizens' personal data. It introduces:
-- mandatory deletion of inactive user data after 2 years,
-- clear opt-in consent for data sharing with third parties,
-- a right for citizens to request a full export of their stored data.
-""")
-                .category(AmendmentCategory.DIGITAL_PRIVACY)
-                .status(AmendmentStatus.ACTIVE)
-                .createdAt(LocalDateTime.now().minusDays(5))
-                .closesAt(LocalDateTime.now().plusDays(10))
-                .createdBy(admin)
-                .build();
-        privacy = amendmentRepository.save(privacy);
+            // 2. Get admin user for creating amendments
+            User admin = userRepository.findByEmail("admin@gmail.com")
+                    .orElseThrow(() -> new IllegalStateException("Expected admin user to exist"));
 
-        commentRepository.save(Comment.builder()
-                .user(user)
-                .amendment(privacy)
-                .body("I support this. Citizens should have clear control over how long platforms keep their data.")
-                .build());
+            // 3. Process each amendment
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> amendments = (List<Map<String, Object>>) dataset.get("amendments");
 
-        commentRepository.save(Comment.builder()
-                .user(admin)
-                .amendment(privacy)
-                .body("Please clarify how this will impact small startups that rely on analytics data.")
-                .build());
+            int totalComments = 0;
+            int totalVotes = 0;
 
-        // Amendment 2 – Public Transport & Air Quality
-        Amendment transport = Amendment.builder()
-                .title("Urban Public Transport and Air Quality Improvement Amendment")
-                .body("""
-This amendment funds the expansion of electric bus fleets and dedicated bus lanes
-in major cities. It also introduces low-emission zones where highly polluting
-vehicles will be restricted during peak hours.
-""")
-                .category(AmendmentCategory.INFRASTRUCTURE)
-                .status(AmendmentStatus.ACTIVE)
-                .createdAt(LocalDateTime.now().minusDays(3))
-                .closesAt(LocalDateTime.now().plusDays(7))
-                .createdBy(admin)
-                .build();
-        transport = amendmentRepository.save(transport);
+            for (int aIdx = 0; aIdx < amendments.size(); aIdx++) {
+                Map<String, Object> amd = amendments.get(aIdx);
 
-        commentRepository.save(Comment.builder()
-                .user(user)
-                .amendment(transport)
-                .body("This is good for air quality, but please include subsidies for low-income commuters.")
-                .build());
+                Amendment amendment = Amendment.builder()
+                        .title((String) amd.get("title"))
+                        .body((String) amd.get("body"))
+                        .category(AmendmentCategory.valueOf((String) amd.get("category")))
+                        .status(AmendmentStatus.valueOf((String) amd.get("status")))
+                        .createdAt(LocalDateTime.now().minusDays(14 - aIdx * 2))
+                        .closesAt(LocalDateTime.now().plusDays(30 + aIdx * 5))
+                        .createdBy(admin)
+                        .build();
+                amendment = amendmentRepository.save(amendment);
 
-        commentRepository.save(Comment.builder()
-                .user(user)
-                .amendment(transport)
-                .body("Will there be enough charging infrastructure for the new electric buses?")
-                .build());
+                // 4. Process comments for this amendment
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> comments = (List<Map<String, Object>>) amd.get("comments");
 
-        // Amendment 3 – Education & Digital Skills
-        Amendment education = Amendment.builder()
-                .title("Digital Skills Curriculum in Public Schools Amendment")
-                .body("""
-This amendment requires all public secondary schools to introduce a basic digital skills
-curriculum. Topics include online safety, critical evaluation of information sources,
-and introductory programming.
-""")
-                .category(AmendmentCategory.EDUCATION)
-                .status(AmendmentStatus.ACTIVE)
-                .createdAt(LocalDateTime.now().minusDays(1))
-                .closesAt(LocalDateTime.now().plusDays(14))
-                .createdBy(admin)
-                .build();
-        education = amendmentRepository.save(education);
+                for (Map<String, Object> c : comments) {
+                    int userIndex = ((Number) c.get("user_index")).intValue();
+                    User commentUser = users.get(userIndex % users.size());
 
-        commentRepository.save(Comment.builder()
-                .user(user)
-                .amendment(education)
-                .body("Great idea. Please ensure the curriculum also covers misinformation and deepfakes.")
-                .build());
+                    Comment comment = Comment.builder()
+                            .amendment(amendment)
+                            .user(commentUser)
+                            .body((String) c.get("body"))
+                            .build();
+                    comment = commentRepository.save(comment);
+                    totalComments++;
 
-        log.info("Sample amendments and comments created for demo purposes.");
+                    // 5. Generate vote entities for this comment
+                    int upvotes = ((Number) c.get("upvotes")).intValue();
+                    int downvotes = ((Number) c.get("downvotes")).intValue();
+
+                    // Distribute upvotes across users (round-robin, skip comment author)
+                    int voteUserIdx = 0;
+                    for (int v = 0; v < upvotes && v < users.size() - 1; v++) {
+                        User voter = users.get(voteUserIdx % users.size());
+                        if (voter.getId().equals(commentUser.getId())) {
+                            voteUserIdx++;
+                            voter = users.get(voteUserIdx % users.size());
+                        }
+                        if (!voteRepository.existsByUserIdAndCommentId(voter.getId(), comment.getId())) {
+                            Vote vote = Vote.builder()
+                                    .user(voter)
+                                    .comment(comment)
+                                    .value((short) 1)
+                                    .build();
+                            voteRepository.save(vote);
+                            totalVotes++;
+                        }
+                        voteUserIdx++;
+                    }
+
+                    // Distribute downvotes across remaining users
+                    for (int v = 0; v < downvotes && voteUserIdx < users.size(); v++) {
+                        User voter = users.get(voteUserIdx % users.size());
+                        if (voter.getId().equals(commentUser.getId())) {
+                            voteUserIdx++;
+                            if (voteUserIdx >= users.size()) break;
+                            voter = users.get(voteUserIdx % users.size());
+                        }
+                        if (!voteRepository.existsByUserIdAndCommentId(voter.getId(), comment.getId())) {
+                            Vote vote = Vote.builder()
+                                    .user(voter)
+                                    .comment(comment)
+                                    .value((short) -1)
+                                    .build();
+                            voteRepository.save(vote);
+                            totalVotes++;
+                        }
+                        voteUserIdx++;
+                    }
+                }
+
+                log.info("Seeded amendment '{}' with {} comments",
+                        amendment.getTitle().substring(0, Math.min(50, amendment.getTitle().length())),
+                        comments.size());
+            }
+
+            log.info("Dataset seeding complete: {} amendments, {} comments, {} votes",
+                    amendments.size(), totalComments, totalVotes);
+
+        } catch (Exception e) {
+            log.error("Failed to seed dataset from fcc_dataset.json: {}", e.getMessage(), e);
+        }
     }
 }
-
