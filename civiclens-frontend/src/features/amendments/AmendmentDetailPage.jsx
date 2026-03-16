@@ -42,17 +42,17 @@ export default function AmendmentDetailPage() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in h-[calc(100vh-112px)] flex flex-col">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-dark-500 mb-6">
+      <div className="flex items-center gap-2 text-sm text-dark-500 mb-6 flex-shrink-0">
         <Link to="/" className="hover:text-civic-400 transition-colors">Amendments</Link>
         <span>/</span>
         <span className="text-dark-300 truncate max-w-[300px]">{amendment.title}</span>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 overflow-hidden">
         {/* Main Content */}
-        <div className="flex-1 min-w-0 space-y-6">
+        <div className="flex-1 min-w-0 space-y-6 overflow-y-auto pr-1 pb-6 relative">
           {/* Amendment Header */}
           <div className="glass-card p-6">
             {/* Meta row */}
@@ -126,10 +126,8 @@ export default function AmendmentDetailPage() {
         </div>
 
         {/* Right Sidebar — Analytics (Desktop) */}
-        <div className="hidden lg:block w-[380px] flex-shrink-0">
-          <div className="sticky top-20">
-            <AnalyticsPanel amendmentId={amendment.id} />
-          </div>
+        <div className="hidden lg:block w-[380px] flex-shrink-0 overflow-y-auto pr-1 pb-6 relative">
+          <AnalyticsPanel amendmentId={amendment.id} />
         </div>
       </div>
     </div>

@@ -5,8 +5,6 @@ export const CATEGORIES = [
 
 export const SORTS = [
   { value: 'LATEST', label: 'Latest' },
-  { value: 'MOST_UPVOTED', label: 'Most Upvoted' },
-  { value: 'MOST_NEGATIVE', label: 'Most Negative' },
 ]
 
 export const CATEGORY_COLORS = {
