@@ -14,7 +14,7 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
 
     @org.springframework.data.jpa.repository.Modifying
-    @Query("DELETE FROM Vote v WHERE v.comment.amendment.id = :amendmentId")
+    @Query("DELETE FROM Vote v WHERE v.comment.id IN (SELECT c.id FROM Comment c WHERE c.amendment.id = :amendmentId)")
     void deleteByAmendmentId(@Param("amendmentId") Long amendmentId);
 
     // Per-comment vote counts
