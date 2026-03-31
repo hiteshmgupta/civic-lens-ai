@@ -37,9 +37,9 @@ async def summarize(amendment_text: str, comments: list[str]) -> str:
                 "inputs": context,
                 "parameters": {
                     "max_length": 300,
-                    "min_length": 80,
+                    "min_length": 15,
                     "do_sample": False,
-                    "num_beams": 4,
+                    "num_beams": 3,
                 },
             },
         )
