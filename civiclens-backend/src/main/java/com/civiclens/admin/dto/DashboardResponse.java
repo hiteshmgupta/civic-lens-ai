@@ -15,6 +15,7 @@ public class DashboardResponse {
     private long totalComments;
     private long totalVotes;
     private Double globalSentimentMean;
+    private Map<String, Long> globalSentimentDistribution;
     private List<Map<String, Object>> mostControversial;
     private List<Map<String, Object>> participationTrend;
     private Map<String, Long> topicDistribution;

@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, Long> {
@@ -25,4 +26,8 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     @Query("SELECT COALESCE(SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.amendment.id = :amendmentId")
     int countDownvotesByAmendmentId(@Param("amendmentId") Long amendmentId);
+
+    @Query(value = "SELECT TO_CHAR(cv.created_at, 'YYYY-MM') AS period, COUNT(*) AS cnt " +
+            "FROM comment_votes cv GROUP BY period ORDER BY period", nativeQuery = true)
+    List<Object[]> countGroupedByMonth();
 }
