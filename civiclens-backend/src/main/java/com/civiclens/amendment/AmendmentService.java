@@ -161,4 +161,24 @@ public class AmendmentService {
 
         return builder.build();
     }
+
+    @Transactional
+    public void deleteAmendment(Long id) {
+        Amendment amendment = amendmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Amendment not found: " + id));
+
+        // Delete analytics
+        analyticsRepository.findByAmendmentId(id).ifPresent(analyticsRepository::delete);
+
+        // Delete votes linked to comments on this amendment
+        voteRepository.deleteByAmendmentId(id);
+
+        // Delete comments on this amendment
+        commentRepository.deleteByAmendmentId(id);
+
+        // Finally, delete the amendment itself
+        amendmentRepository.delete(amendment);
+        
+        log.info("Amendment deleted along with cascade records: id={}", id);
+    }
 }

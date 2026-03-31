@@ -73,7 +73,15 @@ public class AnalyticsService {
         double[] sentimentScores = aiResponse.getSentimentScores().stream()
                 .mapToDouble(Double::doubleValue).toArray();
 
-        double S = calculator.sentimentVariance(sentimentScores);
+        double[] weights = new double[comments.size()];
+        for (int i = 0; i < comments.size(); i++) {
+            Comment c = comments.get(i);
+            int commentUp = voteRepository.countUpvotesByCommentId(c.getId());
+            int commentDown = voteRepository.countDownvotesByCommentId(c.getId());
+            weights[i] = 1.0 + commentUp + commentDown; // Base weight 1 + total votes
+        }
+
+        double S = calculator.sentimentVariance(sentimentScores, weights);
         double P = calculator.votePolarity(upvotes, downvotes);
         double D = calculator.stanceEntropy(aiResponse.getStanceCounts());
         double E = calculator.engagementIntensity(totalComments, (int) Math.max(maxComments * 3, 100));

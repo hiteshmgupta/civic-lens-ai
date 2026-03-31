@@ -72,18 +72,22 @@ export default function ControversyScore({ score, label, analytics }) {
           <BreakdownRow
             label="Sentiment Variance (S)"
             value={analytics.sentimentVariance}
+            textLabel={getSentimentLabel(analytics.sentimentVariance)}
           />
           <BreakdownRow
             label="Vote Polarity (P)"
             value={analytics.votePolarity}
+            textLabel={getPolarityLabel(analytics.votePolarity)}
           />
           <BreakdownRow
             label="Stance Entropy (D)"
             value={analytics.stanceEntropy}
+            textLabel={getEntropyLabel(analytics.stanceEntropy)}
           />
           <BreakdownRow
             label="Engagement (E)"
             value={analytics.engagementScore}
+            textLabel={getEngagementLabel(analytics.engagementScore)}
           />
         </div>
       )}
@@ -91,13 +95,44 @@ export default function ControversyScore({ score, label, analytics }) {
   )
 }
 
-function BreakdownRow({ label, value }) {
+// Admin-Friendly Helper Functions
+function getSentimentLabel(val) {
+  if (val < 0.25) return "Highly Uniform"
+  if (val < 0.50) return "Mostly Consistent"
+  if (val < 0.75) return "Moderately Divided"
+  return "Highly Divided"
+}
+
+function getPolarityLabel(val) {
+  if (val < 0.25) return "Unanimous"
+  if (val < 0.50) return "Strongly Skewed"
+  if (val < 0.75) return "Moderately Split"
+  return "Evenly Split"
+}
+
+function getEntropyLabel(val) {
+  if (val < 0.25) return "Single Narrative"
+  if (val < 0.50) return "Few Perspectives"
+  if (val < 0.75) return "Multiple Views"
+  return "Highly Diverse"
+}
+
+function getEngagementLabel(val) {
+  if (val < 0.25) return "Low Activity"
+  if (val < 0.50) return "Moderate Activity"
+  if (val < 0.75) return "High Traffic"
+  return "Viral Activity"
+}
+
+function BreakdownRow({ label, value, textLabel }) {
   if (value === null || value === undefined) return null
   const pct = Math.round(value * 100)
   return (
     <div>
       <div className="flex justify-between text-xs mb-1">
-        <span className="text-dark-400">{label}</span>
+        <span className="text-dark-400">
+          {label} {textLabel && <span className="text-dark-500 ml-1">· {textLabel}</span>}
+        </span>
         <span className="text-dark-300 font-mono">{value.toFixed(3)}</span>
       </div>
       <div className="h-1.5 bg-dark-800 rounded-full overflow-hidden">

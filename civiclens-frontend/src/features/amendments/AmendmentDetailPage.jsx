@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { getAmendment } from '../../api/amendmentApi'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { getAmendment, deleteAmendment } from '../../api/amendmentApi'
+import { useAuth } from '../../context/AuthContext'
 import CategoryBadge from './CategoryBadge'
 import CountdownTimer from './CountdownTimer'
 import CommentSection from './CommentSection'
@@ -11,10 +12,30 @@ import { formatDateTime } from '../../utils/constants'
 
 export default function AmendmentDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { isAdmin } = useAuth()
+  
   const [amendment, setAmendment] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showAnalytics, setShowAnalytics] = useState(true)
+
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this amendment? This action cannot be undone and will delete all associated analytics, comments, and votes.")
+    if (!confirmDelete) return
+
+    setIsDeleting(true)
+    try {
+      await deleteAmendment(id)
+      navigate('/')
+    } catch (err) {
+      console.error('Failed to delete amendment:', err)
+      alert('Failed to delete amendment. Please try again.')
+      setIsDeleting(false)
+    }
+  }
 
   useEffect(() => {
     const fetchAmendment = async () => {
@@ -68,10 +89,22 @@ export default function AmendmentDetailPage() {
               <SentimentIndicator score={amendment.sentimentMean} size="md" />
             </div>
 
-            {/* Title */}
-            <h1 className="text-2xl font-bold text-dark-50 mb-3 leading-tight">
-              {amendment.title}
-            </h1>
+            {/* Title & Delete Button */}
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <h1 className="text-2xl font-bold text-dark-50 leading-tight">
+                {amendment.title}
+              </h1>
+              {isAdmin && (
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex-shrink-0 px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold rounded-lg border border-rose-500/20 transition-colors disabled:opacity-50"
+                  title="Delete Amendment (Admin Only)"
+                >
+                  {isDeleting ? 'Deleting...' : '🗑️ Delete'}
+                </button>
+              )}
+            </div>
 
             {/* Author + Date */}
             <div className="flex items-center gap-3 text-sm text-dark-400 mb-4">

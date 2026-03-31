@@ -60,28 +60,28 @@ class ControversyCalculatorTest {
     @Test
     @DisplayName("S = 0.0 for empty scores array")
     void sentimentVariance_empty_returnsZero() {
-        assertEquals(0.0, calculator.sentimentVariance(new double[] {}), 1e-9);
-        assertEquals(0.0, calculator.sentimentVariance(null), 1e-9);
+        assertEquals(0.0, calculator.sentimentVariance(new double[] {}, null), 1e-9);
+        assertEquals(0.0, calculator.sentimentVariance(null, null), 1e-9);
     }
 
     @Test
     @DisplayName("S = 0.0 for uniform sentiment (no variance)")
     void sentimentVariance_uniform_returnsZero() {
-        assertEquals(0.0, calculator.sentimentVariance(new double[] { 0.5, 0.5, 0.5 }), 1e-9);
+        assertEquals(0.0, calculator.sentimentVariance(new double[] { 0.5, 0.5, 0.5 }, null), 1e-9);
     }
 
     @Test
     @DisplayName("S > 0 for mixed sentiment scores")
     void sentimentVariance_mixed_returnsPositive() {
         // scores: -1, 1 → mean=0, variance = (1+1)/2 = 1.0
-        double s = calculator.sentimentVariance(new double[] { -1.0, 1.0 });
+        double s = calculator.sentimentVariance(new double[] { -1.0, 1.0 }, null);
         assertEquals(1.0, s, 1e-9);
     }
 
     @Test
     @DisplayName("S is bounded to [0,1]")
     void sentimentVariance_bounded() {
-        double s = calculator.sentimentVariance(new double[] { -1.0, 1.0, -1.0, 1.0 });
+        double s = calculator.sentimentVariance(new double[] { -1.0, 1.0, -1.0, 1.0 }, null);
         assertTrue(s >= 0 && s <= 1.0, "Variance should be in [0,1], got: " + s);
     }
 
@@ -118,10 +118,10 @@ class ControversyCalculatorTest {
     }
 
     @Test
-    @DisplayName("D = 0.0 for single category")
-    void stanceEntropy_singleCategory_returnsZero() {
+    @DisplayName("D = 0.1 for single category")
+    void stanceEntropy_singleCategory_returnsLowValue() {
         Map<String, Integer> counts = Map.of("support", 100);
-        assertEquals(0.0, calculator.stanceEntropy(counts), 1e-9);
+        assertEquals(0.1, calculator.stanceEntropy(counts), 1e-9);
     }
 
     @Test
@@ -175,12 +175,9 @@ class ControversyCalculatorTest {
     // ---------------------------------------------------------------
 
     @Test
-    @DisplayName("C = 0 when any component is zero")
-    void controversyScore_zeroComponent() {
-        assertEquals(0.0, calculator.controversyScore(0.5, 0.0, 0.5, 0.5), 1e-9);
-        assertEquals(0.0, calculator.controversyScore(0.0, 0.5, 0.5, 0.5), 1e-9);
-        assertEquals(0.0, calculator.controversyScore(0.5, 0.5, 0.0, 0.5), 1e-9);
-        assertEquals(0.0, calculator.controversyScore(0.5, 0.5, 0.5, 0.0), 1e-9);
+    @DisplayName("C is non-zero because it's an average now")
+    void controversyScore_zeroComponent_isAverage() {
+        assertEquals(0.25, calculator.controversyScore(1.0, 0.0, 0.0, 0.0), 1e-9);
     }
 
     @Test

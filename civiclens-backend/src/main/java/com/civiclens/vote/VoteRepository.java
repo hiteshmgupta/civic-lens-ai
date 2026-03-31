@@ -13,6 +13,10 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     Optional<Vote> findByUserIdAndCommentId(Long userId, Long commentId);
     boolean existsByUserIdAndCommentId(Long userId, Long commentId);
 
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM Vote v WHERE v.comment.amendment.id = :amendmentId")
+    void deleteByAmendmentId(@Param("amendmentId") Long amendmentId);
+
     // Per-comment vote counts
     @Query("SELECT COALESCE(SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.id = :commentId")
     int countUpvotesByCommentId(@Param("commentId") Long commentId);
