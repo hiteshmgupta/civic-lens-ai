@@ -3,6 +3,7 @@ package com.civiclens.amendment;
 import com.civiclens.amendment.dto.*;
 import com.civiclens.analytics.AmendmentAnalytics;
 import com.civiclens.analytics.AnalyticsRepository;
+import com.civiclens.analytics.AnalyticsSyncService;
 import com.civiclens.comment.CommentRepository;
 import com.civiclens.common.dto.PagedResponse;
 import com.civiclens.common.exception.ResourceNotFoundException;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +32,7 @@ public class AmendmentService {
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final AnalyticsRepository analyticsRepository;
+    private final AnalyticsSyncService analyticsSyncService;
 
     @Transactional
     public AmendmentResponse create(AmendmentRequest request, String userEmail) {
@@ -50,6 +54,7 @@ public class AmendmentService {
                 .amendment(amendment)
                 .build();
         analyticsRepository.save(analytics);
+        queueAnalyticsRefreshAfterCommit(amendment.getId(), false, "amendment-created");
 
         log.info("Amendment created: id={}, title={}", amendment.getId(), amendment.getTitle());
         return toResponse(amendment);
@@ -116,6 +121,7 @@ public class AmendmentService {
         }
 
         amendment = amendmentRepository.save(amendment);
+        queueAnalyticsRefreshAfterCommit(amendment.getId(), true, "amendment-updated");
         log.info("Amendment updated: id={}", id);
         return toResponse(amendment);
     }
@@ -158,6 +164,9 @@ public class AmendmentService {
             builder.controversyScore(analytics.getControversyScore());
             builder.controversyLabel(analytics.getControversyLabel());
         });
+        if (analyticsSyncService != null && analyticsSyncService.isRefreshNeeded(a.getId())) {
+            analyticsSyncService.requestRefresh(a.getId(), false, "amendment-list-stale");
+        }
 
         return builder.build();
     }
@@ -180,5 +189,23 @@ public class AmendmentService {
         amendmentRepository.delete(amendment);
         
         log.info("Amendment deleted along with cascade records: id={}", id);
+    }
+
+    private void queueAnalyticsRefreshAfterCommit(Long amendmentId, boolean force, String reason) {
+        if (analyticsSyncService == null) {
+            return;
+        }
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    analyticsSyncService.requestRefresh(amendmentId, force, reason);
+                }
+            });
+            return;
+        }
+
+        analyticsSyncService.requestRefresh(amendmentId, force, reason);
     }
 }

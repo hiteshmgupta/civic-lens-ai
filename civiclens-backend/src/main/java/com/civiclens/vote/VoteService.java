@@ -1,6 +1,7 @@
 package com.civiclens.vote;
 
 import com.civiclens.amendment.AmendmentStatus;
+import com.civiclens.analytics.AnalyticsSyncService;
 import com.civiclens.comment.Comment;
 import com.civiclens.comment.CommentRepository;
 import com.civiclens.common.exception.ResourceNotFoundException;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Optional;
 
@@ -21,6 +24,7 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final AnalyticsSyncService analyticsSyncService;
 
     @Transactional
     public void vote(Long commentId, VoteRequest request, String userEmail) {
@@ -62,6 +66,8 @@ public class VoteService {
             voteRepository.save(vote);
             log.info("Vote cast: user={}, comment={}, value={}", user.getId(), commentId, request.getValue());
         }
+
+        queueAnalyticsRefreshAfterCommit(comment.getAmendment().getId(), "vote-upsert");
     }
 
     @Transactional
@@ -74,5 +80,24 @@ public class VoteService {
 
         voteRepository.delete(vote);
         log.info("Vote removed: user={}, comment={}", user.getId(), commentId);
+        queueAnalyticsRefreshAfterCommit(vote.getComment().getAmendment().getId(), "vote-remove");
+    }
+
+    private void queueAnalyticsRefreshAfterCommit(Long amendmentId, String reason) {
+        if (analyticsSyncService == null) {
+            return;
+        }
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    analyticsSyncService.requestRefresh(amendmentId, false, reason);
+                }
+            });
+            return;
+        }
+
+        analyticsSyncService.requestRefresh(amendmentId, false, reason);
     }
 }
