@@ -20,7 +20,7 @@ app:
   jwt:
     # Removed fallback secret for security
     secret: ${JWT_SECRET}
-    expiration: 86400000 # 24 hours
+    expiration-ms: 86400000 # 24 hours
   
   # Added a variable for CORS to allow the frontend production URL
   frontend:
