@@ -33,6 +33,8 @@ analytics:
   refresh:
     interval-ms: 180000
     initial-delay-ms: 45000
+  backfill:
+    enabled: false  # Disabled during startup to prevent blocking on Render; will run on schedule
 
 logging:
   level:
