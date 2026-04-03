@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-d6nc8675r7bs73cugnu0-a.singapore-postgres.render.com/civiclens_db_lrtg}
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://dpg-d6nc8675r7bs73cugnu0-a.singapore-postgres.render.com/civiclens_db_lrtg}
     username: ${DB_USERNAME:civiclens_db_lrtg_user}
     password: ${DB_PASSWORD:nAbLmYtfIDHWhrQZKG3VE6gEbRTNYHdl}
     driver-class-name: org.postgresql.Driver
