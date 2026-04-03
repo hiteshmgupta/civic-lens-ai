@@ -1,6 +1,7 @@
 package com.civiclens.comment;
 
 import com.civiclens.amendment.*;
+import com.civiclens.analytics.AnalyticsSyncService;
 import com.civiclens.comment.dto.*;
 import com.civiclens.common.dto.PagedResponse;
 import com.civiclens.common.exception.ResourceNotFoundException;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +27,7 @@ public class CommentService {
     private final AmendmentRepository amendmentRepository;
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
+    private final AnalyticsSyncService analyticsSyncService;
 
     @Transactional
     public CommentResponse create(Long amendmentId, CommentRequest request, String userEmail) {
@@ -45,6 +49,7 @@ public class CommentService {
 
         comment = commentRepository.save(comment);
         log.info("Comment added: amendment={}, user={}", amendmentId, user.getId());
+        queueAnalyticsRefreshAfterCommit(amendmentId, "comment-created");
 
         return toResponse(comment);
     }
@@ -78,5 +83,23 @@ public class CommentService {
                 .downvotes(down)
                 .createdAt(c.getCreatedAt())
                 .build();
+    }
+
+    private void queueAnalyticsRefreshAfterCommit(Long amendmentId, String reason) {
+        if (analyticsSyncService == null) {
+            return;
+        }
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    analyticsSyncService.requestRefresh(amendmentId, false, reason);
+                }
+            });
+            return;
+        }
+
+        analyticsSyncService.requestRefresh(amendmentId, false, reason);
     }
 }

@@ -4,10 +4,24 @@ Model: cardiffnlp/twitter-roberta-base-sentiment-latest
 Outputs scores in [-1, 1] range: negative=-1, neutral=0, positive=1.
 """
 import logging
+import re
 from config import SENTIMENT_MODEL
 import hf_client
 
 logger = logging.getLogger(__name__)
+
+POSITIVE_HINTS = {
+    "support", "necessary", "critical", "essential", "welcome", "excellent",
+    "important", "benefit", "improve", "effective", "protect", "security",
+    "bargain", "invest", "coordination", "funding",
+}
+
+NEGATIVE_HINTS = {
+    "concern", "concerned", "oppose", "failed", "failure", "insufficient",
+    "cost", "costs", "bureaucratic", "inefficiencies", "inefficient",
+    "surveillance", "blurred", "outdated", "expensive", "risk", "crowd",
+    "neglects", "massive", "poor", "plagued",
+}
 
 
 def load_model():
@@ -37,7 +51,7 @@ async def analyze(texts: list[str]) -> list[float]:
                 scores.append(score)
         except Exception as e:
             logger.error("Sentiment API call failed: %s", str(e))
-            scores.extend([0.0] * len(batch))
+            scores.extend(_heuristic_score(text) for text in batch)
 
     return scores
 
@@ -57,7 +71,28 @@ def get_distribution(scores: list[float]) -> dict:
 
 def _convert_to_score(result: list[dict]) -> float:
     """Convert API output to single [-1, 1] score."""
-    label_scores = {item["label"].lower(): item["score"] for item in result}
-    pos = label_scores.get("positive", 0)
-    neg = label_scores.get("negative", 0)
+    label_scores = {}
+    for item in result:
+        label = str(item.get("label", "")).lower().strip()
+        score = float(item.get("score", 0.0))
+        label_scores[label] = score
+
+    # Handle both explicit labels and numeric labels used by some HF models.
+    pos = label_scores.get("positive", label_scores.get("label_2", 0.0))
+    neg = label_scores.get("negative", label_scores.get("label_0", 0.0))
     return pos - neg
+
+
+def _heuristic_score(text: str) -> float:
+    """Fallback sentiment score when the external model is unavailable."""
+    tokens = re.findall(r"[a-z']+", text.lower())
+    if not tokens:
+        return 0.0
+
+    pos_hits = sum(1 for token in tokens if token in POSITIVE_HINTS)
+    neg_hits = sum(1 for token in tokens if token in NEGATIVE_HINTS)
+    if pos_hits == 0 and neg_hits == 0:
+        return 0.0
+
+    score = (pos_hits - neg_hits) / max(pos_hits + neg_hits, 1)
+    return max(-1.0, min(1.0, round(score, 4)))
