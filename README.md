@@ -125,9 +125,11 @@ civic-lens-ai/
 ├── civiclens-backend/    → Spring Boot REST API (deployed on Render)
 ├── civiclens-ai/         → Python FastAPI AI microservice (deployed on Render)
 ├── civiclens-mobile/     → React Native Expo app (WebView wrapper)
-├── FEATURES.txt          → Full feature list for presentation
+├── scripts/              → Dataset preparation scripts
+├── SETUP.md              → Complete installation guide
 └── CHANGELOG.md          → Version history
 ```
+
 
 ---
 
