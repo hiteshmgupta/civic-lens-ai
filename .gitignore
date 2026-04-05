@@ -27,10 +27,26 @@ target/
 *.swp
 .mvn/wrapper/maven-wrapper.jar
 
-### Node / Vite frontends
+### Node / Vite / React Native
 node_modules/
 dist/
 .vite/
+
+### Expo / React Native
+.expo/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.tsbuildinfo
+
+# Generated native folders (Expo prebuild)
+civiclens-mobile/ios/
+civiclens-mobile/android/
 
 ### Environment & secrets
 .env
@@ -53,3 +69,8 @@ Thumbs.db
 
 ### ngrok
 ngrok.exe
+
+### Debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
