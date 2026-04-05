@@ -88,7 +88,7 @@ export default function AnalyticsPanel({ amendmentId }) {
             <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" />
             <path d="M7 14l4-4 4 4 6-6" />
           </svg>
-          AI Impact Analysis
+          Impact Analysis
         </h3>
         <div className="flex items-center gap-2">
           {isAdmin && (
@@ -116,7 +116,7 @@ export default function AnalyticsPanel({ amendmentId }) {
           <div className="text-3xl sm:text-4xl mb-3">🔬</div>
           <h4 className="text-dark-200 font-semibold mb-2 text-sm sm:text-base">No Analysis Available</h4>
           <p className="text-xs sm:text-sm text-dark-400 mb-4">
-            Click below to run AI analysis on the existing comments.
+            Click below to run analysis on the existing comments.
           </p>
           {isAdmin && (
             <button onClick={handleReanalyze} disabled={analyzing} className="btn-primary text-xs sm:text-sm">
@@ -157,28 +157,30 @@ export default function AnalyticsPanel({ amendmentId }) {
           {/* Policy Brief */}
           <PolicyBrief brief={analytics.policyBrief} />
 
-          {/* Export Button */}
-          <button
-            onClick={handleExportPdf}
-            disabled={exporting}
-            className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 text-xs sm:text-sm"
-          >
-            {exporting ? (
-              <>
-                <LoadingSpinner size="sm" />
-                Generating Report...
-              </>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <path d="M14 2v6h6" />
-                  <path d="M12 18v-6M9 15l3 3 3-3" />
-                </svg>
-                Generate Full Report →
-              </>
-            )}
-          </button>
+          {/* Export Button — Admin Only */}
+          {isAdmin && (
+            <button
+              onClick={handleExportPdf}
+              disabled={exporting}
+              className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 text-xs sm:text-sm"
+            >
+              {exporting ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Generating Report...
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 2v6h6" />
+                    <path d="M12 18v-6M9 15l3 3 3-3" />
+                  </svg>
+                  Download Full Report →
+                </>
+              )}
+            </button>
+          )}
         </>
       )}
     </div>

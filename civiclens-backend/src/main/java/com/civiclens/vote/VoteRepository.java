@@ -17,6 +17,10 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     @Query("DELETE FROM Vote v WHERE v.comment.id IN (SELECT c.id FROM Comment c WHERE c.amendment.id = :amendmentId)")
     void deleteByAmendmentId(@Param("amendmentId") Long amendmentId);
 
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM Vote v WHERE v.comment.id = :commentId")
+    void deleteByCommentId(@Param("commentId") Long commentId);
+
     // Per-comment vote counts
     @Query("SELECT COALESCE(SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END), 0) FROM Vote v WHERE v.comment.id = :commentId")
     int countUpvotesByCommentId(@Param("commentId") Long commentId);

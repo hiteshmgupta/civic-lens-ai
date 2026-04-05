@@ -75,7 +75,7 @@ public class PdfReportService {
         if (a.getPolicyBrief() != null) {
             sb.append("<p>").append(esc(a.getPolicyBrief())).append("</p>");
         } else {
-            sb.append("<p>No AI-generated policy brief available.</p>");
+            sb.append("<p>No policy brief available.</p>");
         }
         sb.append("</div>");
 

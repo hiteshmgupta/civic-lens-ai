@@ -1,16 +1,16 @@
-import { CATEGORIES, SORTS } from '../../utils/constants'
+import { CATEGORIES, STATUS_FILTERS } from '../../utils/constants'
 
-export default function FilterBar({ sort, category, onSortChange, onCategoryChange }) {
+export default function FilterBar({ statusFilter, category, onStatusChange, onCategoryChange }) {
   return (
     <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
-      {/* Sort Tabs */}
+      {/* Status Tabs */}
       <div className="flex items-center bg-dark-900/60 rounded-xl p-1 border border-dark-700/50">
-        {SORTS.map(({ value, label }) => (
+        {STATUS_FILTERS.map(({ value, label }) => (
           <button
-            key={value}
-            onClick={() => onSortChange(value)}
+            key={label}
+            onClick={() => onStatusChange(value)}
             className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all duration-200 ${
-              sort === value
+              statusFilter === value
                 ? 'bg-dark-700 text-civic-400 shadow-sm'
                 : 'text-dark-400 hover:text-dark-200'
             }`}

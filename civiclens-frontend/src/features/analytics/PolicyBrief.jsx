@@ -2,7 +2,7 @@ export default function PolicyBrief({ brief }) {
   if (!brief) {
     return (
       <div className="glass-card p-4 sm:p-5 text-center text-xs sm:text-sm text-dark-500">
-        AI policy brief not generated yet.
+        Policy brief not generated yet.
       </div>
     )
   }
@@ -17,20 +17,12 @@ export default function PolicyBrief({ brief }) {
             <path d="M16 13H8M16 17H8M10 9H8" />
           </svg>
         </span>
-        AI-Generated Policy Brief
+        Policy Brief
       </h4>
       <div className="bg-dark-800/40 rounded-xl p-3 sm:p-4 border border-dark-700/30">
         <p className="text-xs sm:text-sm text-dark-300 leading-relaxed whitespace-pre-wrap">
           {brief}
         </p>
-      </div>
-      <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-3">
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-civic-400/10 text-civic-400 text-[9px] sm:text-[10px] font-semibold rounded-full">
-          ✦ AI Generated
-        </span>
-        <span className="text-[9px] sm:text-[10px] text-dark-600">
-          Summarized using BART-large-CNN
-        </span>
       </div>
     </div>
   )

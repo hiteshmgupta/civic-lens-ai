@@ -5,3 +5,6 @@ export const getComments = (amendmentId, params) =>
 
 export const addComment = (amendmentId, data) =>
   api.post(`/api/amendments/${amendmentId}/comments`, data)
+
+export const deleteComment = (commentId) =>
+  api.delete(`/api/admin/comments/${commentId}`)

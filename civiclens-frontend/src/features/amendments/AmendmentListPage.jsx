@@ -8,7 +8,7 @@ export default function AmendmentListPage() {
   const [amendments, setAmendments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [sort, setSort] = useState('LATEST')
+  const [statusFilter, setStatusFilter] = useState('ACTIVE')
   const [category, setCategory] = useState(null)
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -17,7 +17,8 @@ export default function AmendmentListPage() {
     setLoading(true)
     setError(null)
     try {
-      const params = { sort, page, size: 10 }
+      const params = { sort: 'LATEST', page, size: 10 }
+      if (statusFilter) params.status = statusFilter
       if (category) params.category = category
       const res = await getAmendments(params)
       setAmendments(res.data.content || [])
@@ -32,10 +33,10 @@ export default function AmendmentListPage() {
 
   useEffect(() => {
     fetchAmendments()
-  }, [sort, category, page])
+  }, [statusFilter, category, page])
 
-  const handleSortChange = (newSort) => {
-    setSort(newSort)
+  const handleStatusChange = (newStatus) => {
+    setStatusFilter(newStatus)
     setPage(0)
   }
 
@@ -51,16 +52,16 @@ export default function AmendmentListPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-dark-100">Amendments</h1>
           <p className="text-xs sm:text-sm text-dark-400 mt-0.5 sm:mt-1">
-            Browse active legislative amendments and share your voice
+            Browse legislative amendments and share your voice
           </p>
         </div>
       </div>
 
       {/* Filters */}
       <FilterBar
-        sort={sort}
+        statusFilter={statusFilter}
         category={category}
-        onSortChange={handleSortChange}
+        onStatusChange={handleStatusChange}
         onCategoryChange={handleCategoryChange}
       />
 
@@ -79,7 +80,13 @@ export default function AmendmentListPage() {
           <div className="text-4xl mb-4">📋</div>
           <h3 className="text-base sm:text-lg font-semibold text-dark-200 mb-2">No amendments found</h3>
           <p className="text-xs sm:text-sm text-dark-400">
-            {category ? 'Try selecting a different category.' : 'No amendments have been created yet.'}
+            {category
+              ? 'Try selecting a different category.'
+              : statusFilter === 'CLOSED'
+                ? 'No past amendments available.'
+                : statusFilter === 'ACTIVE'
+                  ? 'No active amendments at the moment.'
+                  : 'No amendments have been created yet.'}
           </p>
         </div>
       ) : (

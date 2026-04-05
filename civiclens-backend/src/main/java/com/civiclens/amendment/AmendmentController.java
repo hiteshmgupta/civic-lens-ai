@@ -20,9 +20,10 @@ public class AmendmentController {
     public ResponseEntity<PagedResponse<AmendmentResponse>> list(
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(amendmentService.list(sort, category, page, size));
+        return ResponseEntity.ok(amendmentService.list(sort, category, status, page, size));
     }
 
     @GetMapping("/{id}")

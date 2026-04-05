@@ -102,4 +102,21 @@ public class CommentService {
 
         analyticsSyncService.requestRefresh(amendmentId, false, reason);
     }
+
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
+
+        Long amendmentId = comment.getAmendment().getId();
+
+        // Delete votes on this comment first
+        voteRepository.deleteByCommentId(commentId);
+
+        // Delete the comment
+        commentRepository.delete(comment);
+        log.info("Comment deleted: id={}, amendment={}", commentId, amendmentId);
+
+        queueAnalyticsRefreshAfterCommit(amendmentId, "comment-deleted");
+    }
 }

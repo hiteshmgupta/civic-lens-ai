@@ -7,6 +7,12 @@ export const SORTS = [
   { value: 'LATEST', label: 'Latest' },
 ]
 
+export const STATUS_FILTERS = [
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'CLOSED', label: 'Past' },
+  { value: null, label: 'All' },
+]
+
 export const CATEGORY_COLORS = {
   HEALTHCARE: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
   AGRICULTURE: 'bg-green-500/20 text-green-400 border-green-500/30',

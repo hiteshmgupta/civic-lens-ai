@@ -60,7 +60,7 @@ public class AmendmentService {
         return toResponse(amendment);
     }
 
-    public PagedResponse<AmendmentResponse> list(String sort, String category, int page, int size) {
+    public PagedResponse<AmendmentResponse> list(String sort, String category, String status, int page, int size) {
         Sort sorting = switch (sort != null ? sort : "LATEST") {
             case "MOST_UPVOTED" -> Sort.by(Sort.Direction.DESC, "id"); // we'll sort in-memory or via query
             case "MOST_NEGATIVE" -> Sort.by(Sort.Direction.ASC, "id");
@@ -70,7 +70,21 @@ public class AmendmentService {
         Pageable pageable = PageRequest.of(page, size, sorting);
         Page<Amendment> amendments;
 
-        if (category != null && !category.isEmpty()) {
+        AmendmentStatus statusEnum = null;
+        if (status != null && !status.isEmpty()) {
+            try {
+                statusEnum = AmendmentStatus.valueOf(status);
+            } catch (IllegalArgumentException ignored) {
+                // Invalid status value — ignore and return all
+            }
+        }
+
+        if (statusEnum != null && category != null && !category.isEmpty()) {
+            AmendmentCategory cat = AmendmentCategory.valueOf(category);
+            amendments = amendmentRepository.findByStatusAndCategory(statusEnum, cat, pageable);
+        } else if (statusEnum != null) {
+            amendments = amendmentRepository.findByStatus(statusEnum, pageable);
+        } else if (category != null && !category.isEmpty()) {
             AmendmentCategory cat = AmendmentCategory.valueOf(category);
             amendments = amendmentRepository.findByCategory(cat, pageable);
         } else {
