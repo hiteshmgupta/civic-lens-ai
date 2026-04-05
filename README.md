@@ -21,9 +21,10 @@ Everything is already deployed and running. Just open the link:
 | **Frontend** | [civic-lens-ai-bay.vercel.app](https://civic-lens-ai-bay.vercel.app) | Vercel |
 | **Backend API** | `civiclens-backend-j5q2.onrender.com` | Render |
 | **AI Service** | Render (internal) | Render |
-| **Database** | PostgreSQL (managed) | Render |
 
 **Demo Accounts:**
+
+> ⚠️ These are pre-seeded demo credentials for the **live demo only**. They are not used in any production deployment. Always use strong, unique credentials in production.
 
 | Role | Email | Password |
 |---|---|---|
@@ -42,7 +43,6 @@ Everything is already deployed and running. Just open the link:
 |---|---|---|---|
 | **Java (JDK)** | 21 | [adoptium.net](https://adoptium.net/) | `java --version` → should show 21+ |
 | **Maven** | 3.9+ | [maven.apache.org](https://maven.apache.org/download.cgi) | `mvn --version` → should show 3.9+ |
-| **PostgreSQL** | 14+ | [postgresql.org/download](https://www.postgresql.org/download/) | `psql --version` → should show 14+ |
 | **Node.js** | 18+ (LTS) | [nodejs.org](https://nodejs.org/) | `node --version` → should show v18+ |
 | **npm** | 9+ | Comes with Node.js | `npm --version` → should show 9+ |
 | **Python** | 3.11+ | [python.org/downloads](https://www.python.org/downloads/) | `python --version` → should show 3.11+ |
@@ -51,36 +51,11 @@ Everything is already deployed and running. Just open the link:
 #### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/civic-lens-ai.git
+git clone https://github.com/hiteshmgupta/civic-lens-ai.git
 cd civic-lens-ai
 ```
 
-#### Step 2 — Set Up the Database
-
-Open PostgreSQL and create the database:
-
-```sql
--- In psql or pgAdmin:
-CREATE DATABASE civiclens;
-```
-
-The backend defaults to `localhost:5432`, username `postgres`, password `postgres`. If yours is different, set these environment variables before running the backend:
-
-```bash
-# Windows (Command Prompt)
-set DB_USERNAME=your_username
-set DB_PASSWORD=your_password
-
-# Windows (PowerShell)
-$env:DB_USERNAME="your_username"
-$env:DB_PASSWORD="your_password"
-
-# macOS / Linux
-export DB_USERNAME=your_username
-export DB_PASSWORD=your_password
-```
-
-#### Step 3 — Start the Backend
+#### Step 2 — Start the Backend
 
 ```bash
 cd civiclens-backend
@@ -89,11 +64,10 @@ mvn spring-boot:run
 
 This will:
 - Download all Java dependencies automatically (first run takes a few minutes)
-- Create all database tables automatically
 - Seed demo accounts and sample data
 - Start the API on **http://localhost:8080**
 
-#### Step 4 — Start the AI Service
+#### Step 3 — Start the AI Service
 
 ```bash
 cd civiclens-ai
@@ -119,7 +93,7 @@ python -m uvicorn main:app --port 8000
 
 The AI service runs on **http://localhost:8000**. Health check: `http://localhost:8000/ai/health`
 
-#### Step 5 — Start the Frontend
+#### Step 4 — Start the Frontend
 
 ```bash
 cd civiclens-frontend
@@ -167,7 +141,6 @@ civic-lens-ai/
 | Spring Boot | 4.0.0 |
 | Spring Security | (managed by Spring Boot) |
 | Spring Data JPA | (managed by Spring Boot) |
-| PostgreSQL Driver | (managed by Spring Boot) |
 | Lombok | 1.18.32 |
 | JJWT (JWT library) | 0.12.5 |
 | OpenHTMLtoPDF (PDF generation) | 1.0.10 |
@@ -270,12 +243,10 @@ See [`civiclens-mobile/README.md`](civiclens-mobile/README.md) for more details.
 ### Backend (`civiclens-backend`)
 | Variable | Default | Description |
 |---|---|---|
-| `DATABASE_URL` | `jdbc:postgresql://localhost:5432/civiclens` | JDBC URL for PostgreSQL |
-| `DB_USERNAME` | `postgres` | Database username |
-| `DB_PASSWORD` | `postgres` | Database password |
-| `JWT_SECRET` | (auto-generated) | Secret key for signing JWTs |
+| `JWT_SECRET` | (auto-generated) | Secret key for signing JWTs — **must** be set in production |
 | `AI_SERVICE_URL` | `http://localhost:8000` | URL of the AI microservice |
 | `PORT` | `8080` | Server port |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated allowed frontend origins |
 
 ### AI Service (`civiclens-ai`)
 | Variable | Default | Description |
@@ -311,6 +282,19 @@ See [`civiclens-mobile/README.md`](civiclens-mobile/README.md) for more details.
                             │  (Cloud Inference)   │
                             └──────────────────────┘
 ```
+
+---
+
+## Security
+
+- **Authentication** — JWT-based with BCrypt password hashing
+- **CORS** — Strict origin allowlisting (only configured frontend domains)
+- **Role-based access** — Admin and User roles enforced at API and route level
+- **Environment secrets** — All sensitive values (JWT secret, API tokens) are loaded from environment variables, never hardcoded in source
+- **`.env` files** — Excluded from version control via `.gitignore`; only `.env.example` templates are committed
+- **Dependencies** — Pinned to tested version ranges to prevent supply-chain drift
+
+> 🔒 If you fork this project, immediately rotate all secrets and API tokens. Never commit `.env` files or credentials to Git.
 
 ---
 

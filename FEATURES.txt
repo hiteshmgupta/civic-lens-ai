@@ -131,7 +131,7 @@ You can use this as talking points when presenting to your teacher.
      called from the backend via HTTP.
   3. **Frontend SPA (React)** – interactive web app for citizens and admins.
 - Clean layering
-  - Entities & repositories (database models).
+  - Entities & repositories (data models).
   - Services (business logic).
   - Controllers (HTTP endpoints).
   - DTOs (clean JSON responses to the frontend).

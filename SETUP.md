@@ -9,13 +9,12 @@ This guide covers how to install every tool from scratch, the exact versions use
 1. [Exact Versions Used](#exact-versions-used)
 2. [Install Java 21 (JDK)](#1-install-java-21-jdk)
 3. [Install Maven 3.9+](#2-install-maven-39)
-4. [Install PostgreSQL 14+](#3-install-postgresql-14)
-5. [Install Node.js 18+](#4-install-nodejs-18)
-6. [Install Python 3.11](#5-install-python-311)
-7. [Install Git](#6-install-git)
-8. [Clone & Run the Project](#7-clone--run-the-project)
-9. [Python Virtual Environment Guide](#8-python-virtual-environment-guide)
-10. [Deployment Details](#9-deployment-details)
+4. [Install Node.js 18+](#3-install-nodejs-18)
+5. [Install Python 3.11](#4-install-python-311)
+6. [Install Git](#5-install-git)
+7. [Clone & Run the Project](#6-clone--run-the-project)
+8. [Python Virtual Environment Guide](#7-python-virtual-environment-guide)
+9. [Deployment Details](#8-deployment-details)
 
 ---
 
@@ -29,7 +28,6 @@ These are the exact versions this project was built and tested with. Using diffe
 |---|---|---|
 | Java (JDK) | **21** (Eclipse Temurin) | Required by Spring Boot 4.0. The Dockerfile uses `eclipse-temurin:21` |
 | Maven | **3.9.x** | Required to build the Spring Boot backend. Dockerfile uses `maven:3.9` |
-| PostgreSQL | **14+** | Database. Render uses managed PostgreSQL 14 |
 | Node.js | **18 LTS** or **20 LTS** | Required for Vite 5 and Expo SDK 54 |
 | npm | **9+** | Comes bundled with Node.js 18+ |
 | Python | **3.11** | Exactly 3.11 — the Dockerfile and Render both use `python:3.11-slim` |
@@ -43,12 +41,10 @@ These are the exact versions this project was built and tested with. Using diffe
 | Spring Security | (auto) | Spring Boot BOM |
 | Spring Data JPA | (auto) | Spring Boot BOM |
 | Spring WebFlux (WebClient) | (auto) | Spring Boot BOM |
-| PostgreSQL JDBC Driver | (auto) | Spring Boot BOM |
 | Lombok | 1.18.32 | `pom.xml` |
 | JJWT (JWT library) | 0.12.5 | `pom.xml` |
 | OpenHTMLtoPDF (PDF export) | 1.0.10 | `pom.xml` |
 | Jackson Databind | (auto) | Spring Boot BOM |
-| H2 Database (tests only) | (auto) | Spring Boot BOM |
 | Maven Compiler Plugin | 3.13.0 | `pom.xml` |
 
 ### Frontend Dependencies (Node.js — auto-installed by npm)
@@ -202,58 +198,7 @@ echo %JAVA_HOME%
 
 ---
 
-## 3. Install PostgreSQL 14+
-
-### Windows
-
-1. Go to **https://www.postgresql.org/download/windows/**
-2. Click **"Download the installer"** (from EDB)
-3. Download PostgreSQL **14** or **16** for Windows x86-64
-4. Run the installer:
-   - Set the **superuser password** (remember this — default in our project is `postgres`)
-   - Keep the default port: **5432**
-   - ✅ Check "Stack Builder" if prompted (optional)
-5. After installation, open **pgAdmin** (installed with PostgreSQL) or use the command line:
-   ```bash
-   # Open psql (PostgreSQL command line):
-   psql -U postgres
-   # Enter your password when prompted
-   
-   # Create the database:
-   CREATE DATABASE civiclens;
-   
-   # Verify:
-   \l
-   # Should show "civiclens" in the list
-   
-   # Exit:
-   \q
-   ```
-
-### macOS
-
-```bash
-brew install postgresql@16
-brew services start postgresql@16
-
-# Create database:
-createdb civiclens
-```
-
-### Linux (Ubuntu/Debian)
-
-```bash
-sudo apt update
-sudo apt install -y postgresql postgresql-contrib
-sudo systemctl start postgresql
-
-# Create database:
-sudo -u postgres createdb civiclens
-```
-
----
-
-## 4. Install Node.js 18+
+## 3. Install Node.js 18+
 
 ### Windows
 
@@ -291,7 +236,7 @@ npm --version
 
 ---
 
-## 5. Install Python 3.11
+## 4. Install Python 3.11
 
 **Important:** Use exactly **Python 3.11** — this is what we use in Docker and on Render. Python 3.12+ may have compatibility issues with some of our dependencies.
 
@@ -333,7 +278,7 @@ python3.11 --version
 
 ---
 
-## 6. Install Git
+## 5. Install Git
 
 ### Windows
 
@@ -359,7 +304,7 @@ sudo apt install -y git
 
 ---
 
-## 7. Clone & Run the Project
+## 6. Clone & Run the Project
 
 Now that everything is installed, here's the complete flow:
 
@@ -370,15 +315,18 @@ git clone https://github.com/your-username/civic-lens-ai.git
 cd civic-lens-ai
 ```
 
-### Step 2 — Create the Database
+### Step 2 — Configure Environment Variables
+
+Copy the example environment files and fill in your values:
 
 ```bash
-psql -U postgres
-# Enter your password
-
-CREATE DATABASE civiclens;
-\q
+# Backend — set these before running:
+# Windows CMD:     set JWT_SECRET=your_secret_key
+# PowerShell:      $env:JWT_SECRET="your_secret_key"
+# macOS/Linux:     export JWT_SECRET=your_secret_key
 ```
+
+See the [Environment Variables](#environment-variables) section below for the full list.
 
 ### Step 3 — Start the Backend
 
@@ -386,12 +334,6 @@ Open a new terminal:
 
 ```bash
 cd civic-lens-ai/civiclens-backend
-
-# If your PostgreSQL password is NOT "postgres", set it:
-# Windows CMD:     set DB_PASSWORD=your_password
-# PowerShell:      $env:DB_PASSWORD="your_password"
-# macOS/Linux:     export DB_PASSWORD=your_password
-
 mvn spring-boot:run
 ```
 
@@ -461,7 +403,7 @@ You'll see: `Local: http://localhost:5173/`. Open this URL in your browser.
 
 ---
 
-## 8. Python Virtual Environment Guide
+## 7. Python Virtual Environment Guide
 
 ### What is a Virtual Environment?
 
@@ -546,7 +488,7 @@ python3.11 -m venv .venv
 
 ---
 
-## 9. Deployment Details
+## 8. Deployment Details
 
 This section documents exactly how each service is deployed, so you can replicate it or troubleshoot issues.
 
@@ -560,7 +502,7 @@ This section documents exactly how each service is deployed, so you can replicat
 | Build Command | `npm run build` |
 | Output Directory | `dist` |
 | Node.js Version | 18.x (Vercel default) |
-| Environment Variable | `VITE_API_URL` = `https://civiclens-backend-j5q2.onrender.com` |
+| Environment Variable | `VITE_API_URL` = your Render backend URL |
 
 The `vercel.json` file contains a rewrite rule so all routes serve `index.html` (required for React Router SPA):
 ```json
@@ -584,13 +526,10 @@ Environment variables on Render:
 
 | Variable | Value |
 |---|---|
-| `DATABASE_URL` | `jdbc:postgresql://...` (Render managed PostgreSQL) |
-| `DB_USERNAME` | (from Render PostgreSQL) |
-| `DB_PASSWORD` | (from Render PostgreSQL) |
 | `JWT_SECRET` | (your secret key) |
-| `AI_SERVICE_URL` | `https://your-ai-service.onrender.com` |
+| `AI_SERVICE_URL` | your AI service Render URL |
 | `PORT` | `8080` |
-| `CORS_ALLOWED_ORIGINS` | `https://civic-lens-ai-bay.vercel.app` |
+| `CORS_ALLOWED_ORIGINS` | your Vercel frontend URL |
 
 ### AI Service → Render (Docker)
 
@@ -607,17 +546,8 @@ Environment variables on Render:
 
 | Variable | Value |
 |---|---|
-| `HF_API_TOKEN` | `hf_your_token` |
+| `HF_API_TOKEN` | your HuggingFace token |
 | `PORT` | `8000` |
-
-### Database → Render (Managed PostgreSQL)
-
-| Setting | Value |
-|---|---|
-| Platform | Render |
-| Plan | Free |
-| PostgreSQL Version | 14+ |
-| Connection | Internal URL provided by Render |
 
 ### Mobile App → EAS Build (Expo)
 
@@ -642,6 +572,33 @@ eas build -p android --profile preview
 
 ---
 
+## Environment Variables
+
+### Backend (`civiclens-backend`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `JWT_SECRET` | (auto-generated) | Secret key for signing JWTs |
+| `AI_SERVICE_URL` | `http://localhost:8000` | URL of the AI microservice |
+| `PORT` | `8080` | Server port |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Allowed frontend origins |
+
+### AI Service (`civiclens-ai`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `HF_API_TOKEN` | *(required)* | HuggingFace API token ([get one free](https://huggingface.co/settings/tokens)) |
+| `HOST` | `0.0.0.0` | Server bind address |
+| `PORT` | `8000` | Server port |
+
+### Frontend (`civiclens-frontend`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `VITE_API_URL` | *(see `.env`)* | Backend API URL |
+
+---
+
 ## Troubleshooting Quick Reference
 
 | Problem | Solution |
@@ -652,8 +609,6 @@ eas build -p android --profile preview
 | `node: command not found` | Install Node.js from nodejs.org, restart terminal |
 | `python: command not found` | Try `python3` or `py`. Install from python.org |
 | `No module named 'fastapi'` | Activate venv: `.venv\Scripts\activate`, then `pip install -r requirements.txt` |
-| `psql: command not found` | Install PostgreSQL, or use pgAdmin GUI instead |
-| `FATAL: database "civiclens" does not exist` | Run `CREATE DATABASE civiclens;` in psql |
 | Backend starts but frontend can't connect | Make sure backend is on port 8080, frontend uses Vite proxy |
 | PowerShell "scripts disabled" error | Run: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
 | `npm ERR! code ENOENT` | You're in the wrong folder. `cd` into the right directory |

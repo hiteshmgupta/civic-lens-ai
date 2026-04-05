@@ -41,11 +41,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Only the backend should call this service — restrict origins
+_allowed_origins = [
+    "http://localhost:8080",
+    "https://civiclens-backend-j5q2.onrender.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
@@ -82,7 +88,7 @@ async def analyze(request: AnalysisRequest):
         return AnalysisResponse(**result)
     except Exception as e:
         logger.error("Analysis failed: %s", str(e), exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Analysis failed. Check server logs for details.")
 
 
 if __name__ == "__main__":
