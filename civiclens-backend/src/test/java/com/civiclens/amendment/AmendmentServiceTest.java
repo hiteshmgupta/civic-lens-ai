@@ -150,7 +150,7 @@ class AmendmentServiceTest {
         when(commentRepository.countByAmendmentId(anyLong())).thenReturn(0);
         when(analyticsRepository.findByAmendmentId(anyLong())).thenReturn(Optional.empty());
 
-        PagedResponse<AmendmentResponse> response = amendmentService.list(null, null, 0, 10);
+        PagedResponse<AmendmentResponse> response = amendmentService.list(null, null, null, 0, 10);
 
         assertEquals(1, response.getContent().size());
         assertEquals("Test Amendment", response.getContent().get(0).getTitle());
@@ -167,7 +167,7 @@ class AmendmentServiceTest {
         when(commentRepository.countByAmendmentId(anyLong())).thenReturn(0);
         when(analyticsRepository.findByAmendmentId(anyLong())).thenReturn(Optional.empty());
 
-        PagedResponse<AmendmentResponse> response = amendmentService.list("LATEST", "HEALTHCARE", 0, 10);
+        PagedResponse<AmendmentResponse> response = amendmentService.list("LATEST", "HEALTHCARE", null, 0, 10);
 
         assertEquals(1, response.getContent().size());
         verify(amendmentRepository).findByCategory(eq(AmendmentCategory.HEALTHCARE), any(Pageable.class));
