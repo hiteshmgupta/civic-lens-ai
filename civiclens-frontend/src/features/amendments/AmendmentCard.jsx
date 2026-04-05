@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import CategoryBadge from './CategoryBadge'
 import SentimentIndicator from './SentimentIndicator'
 import CountdownTimer from './CountdownTimer'
 
 export default function AmendmentCard({ amendment }) {
+  const { isAdmin } = useAuth()
   const {
     id, title, body, category, status, createdAt, closesAt,
     createdByUsername, commentCount,
@@ -25,7 +27,7 @@ export default function AmendmentCard({ amendment }) {
           {closesAt && status === 'ACTIVE' && (
             <CountdownTimer closesAt={closesAt} compact />
           )}
-          <SentimentIndicator score={sentimentMean} size="sm" />
+          {isAdmin && <SentimentIndicator score={sentimentMean} size="sm" />}
         </div>
 
         {/* Title */}
@@ -62,7 +64,7 @@ export default function AmendmentCard({ amendment }) {
           <span className="hidden xs:inline">
             {new Date(createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </span>
-          {controversyScore != null && controversyScore > 0 && (
+          {isAdmin && controversyScore != null && controversyScore > 0 && (
             <span className={`flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold ${
               controversyLabel === 'Extreme' ? 'bg-rose-500/15 text-rose-400' :
               controversyLabel === 'High' ? 'bg-orange-500/15 text-orange-400' :
@@ -77,3 +79,4 @@ export default function AmendmentCard({ amendment }) {
     </div>
   )
 }
+

@@ -78,6 +78,51 @@
   }
 }
 
+@layer components {
+  /* Admin Analytics Dashboard Grid */
+  .analytics-dashboard-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .analytics-dashboard-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .analytics-dashboard-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+  }
+
+  .analytics-dashboard-grid .span-full {
+    grid-column: 1 / -1;
+  }
+
+  /* On tablet+, arguments span 2 cols */
+  @media (min-width: 640px) {
+    .analytics-dashboard-grid .span-2 {
+      grid-column: span 2;
+    }
+  }
+
+  /* On desktop, left stack (topics+brief) gets 1 col, arguments get 2 */
+  @media (min-width: 1024px) {
+    .analytics-dashboard-grid .span-2-of-3 {
+      grid-column: span 2;
+    }
+  }
+
+  /* Make glass-card children stretch inside dashboard grid flex wrappers */
+  .analytics-dashboard-grid .glass-card {
+    flex: 1;
+  }
+}
+
 @layer utilities {
   .text-gradient {
     @apply bg-gradient-to-r from-civic-400 to-green-400 bg-clip-text text-transparent;

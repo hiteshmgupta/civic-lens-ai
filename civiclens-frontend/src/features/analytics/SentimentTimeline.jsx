@@ -11,13 +11,18 @@ export default function SentimentTimeline({ timeline }) {
 
   return (
     <div className="glass-card p-4 sm:p-5">
-      <h4 className="text-xs sm:text-sm font-semibold text-dark-200 mb-3 sm:mb-4 flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-civic-400" />
-        Sentiment Timeline
-      </h4>
-      <div className="h-36 sm:h-48">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h4 className="text-xs sm:text-sm font-semibold text-dark-200 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-civic-400" />
+          Sentiment Timeline
+        </h4>
+        <span className="text-[10px] sm:text-xs text-dark-500">
+          {timeline.length} data point{timeline.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+      <div className="h-28 sm:h-36">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={timeline} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+          <AreaChart data={timeline} margin={{ top: 4, right: 5, bottom: -10, left: -20 }}>
             <defs>
               <linearGradient id="sentimentGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#c8ee44" stopOpacity={0.3} />
@@ -28,7 +33,8 @@ export default function SentimentTimeline({ timeline }) {
               dataKey="bucket"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#64748b', fontSize: 10 }}
+              tick={false}
+              height={0}
             />
             <YAxis
               domain={[-1, 1]}
