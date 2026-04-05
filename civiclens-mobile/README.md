@@ -11,6 +11,7 @@ React Native Expo app that wraps the [CivicLens web platform](https://civic-lens
 - Android hardware back button navigates within the app
 - Pull-to-refresh support
 - Cookies & localStorage preserved for auth persistence
+- **Native PDF report downloads** — downloads reports directly on your phone via the share sheet
 
 ## Prerequisites
 
@@ -28,6 +29,8 @@ React Native Expo app that wraps the [CivicLens web platform](https://civic-lens
 | React | 19.1.0 |
 | react-native-webview | 13.15.0 |
 | react-native-safe-area-context | 5.6.0 |
+| expo-file-system | 19.0.21 |
+| expo-sharing | 14.0.8 |
 | Expo Router | 6.0.23 |
 | expo-status-bar | 3.0.9 |
 | TypeScript | 5.9.2 |
@@ -67,6 +70,11 @@ eas build -p android --profile preview
 # (Enable "Install from unknown sources" in Android settings if prompted)
 ```
 
+> **Do I need to rebuild after every code change?**
+> - **Web frontend changes (CSS, React, etc.):** ❌ No rebuild needed. The app loads the Vercel URL — changes deploy automatically.
+> - **Backend/AI changes:** ❌ No rebuild needed. Hosted on Render.
+> - **Mobile app code (`civiclens-mobile/`):** ✅ Yes, only if you change the native wrapper code.
+
 ### Build for iOS
 
 ```bash
@@ -89,7 +97,7 @@ Generates an `.aab` (Android App Bundle) optimized for Google Play Store submiss
 civiclens-mobile/
 ├── app/
 │   ├── _layout.tsx    # Root layout — no header, dark status bar
-│   └── index.tsx      # WebView + SafeAreaView + loading/error UI
+│   └── index.tsx      # WebView + SafeAreaView + PDF download + loading/error UI
 ├── app.json           # App config (name, splash, icons, package IDs)
 ├── eas.json           # EAS Build profiles (development, preview/APK, production/AAB)
 ├── package.json       # Dependencies and scripts

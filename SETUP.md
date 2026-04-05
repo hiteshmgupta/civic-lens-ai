@@ -86,6 +86,8 @@ These are the exact versions this project was built and tested with. Using diffe
 | React | 19.1.0 | UI library |
 | react-native-webview | 13.15.0 | WebView component |
 | react-native-safe-area-context | 5.6.0 | Safe area handling |
+| expo-file-system | 19.0.21 | Native PDF downloads |
+| expo-sharing | 14.0.8 | Share sheet for saved files |
 | Expo Router | 6.0.23 | File-based routing |
 | expo-status-bar | 3.0.9 | Status bar control |
 | TypeScript | 5.9.2 | Type checking |

@@ -208,6 +208,8 @@ civic-lens-ai/
 | React | 19.1.0 |
 | react-native-webview | 13.15.0 |
 | react-native-safe-area-context | 5.6.0 |
+| expo-file-system | 19.0.21 |
+| expo-sharing | 14.0.8 |
 | Expo Router | 6.0.23 |
 | TypeScript | 5.9.2 |
 
@@ -228,7 +230,7 @@ civic-lens-ai/
 
 ## Mobile App
 
-The `civiclens-mobile/` folder contains a React Native Expo app that wraps the web frontend in a fullscreen WebView.
+The `civiclens-mobile/` folder contains a React Native Expo app that wraps the web frontend in a fullscreen WebView. It supports **native PDF report downloads** — reports download directly to your phone and open the share sheet.
 
 **Prerequisites:** Node.js 18+ (already installed if you set up the frontend)
 
@@ -256,6 +258,8 @@ eas build -p android --profile preview
 # After ~10-15 min, you get a download link for the .apk file
 # Install it on any Android phone
 ```
+
+> **Do I need to rebuild after every change?** No — the app loads the Vercel URL, so any web/backend changes are reflected instantly. Only rebuild if you change the native mobile wrapper code.
 
 See [`civiclens-mobile/README.md`](civiclens-mobile/README.md) for more details.
 

@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -8,39 +8,42 @@ import {
   BackHandler,
   Platform,
   Alert,
-  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView, WebViewNavigation } from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 import { useEffect } from 'react';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 
 const WEBAPP_URL = 'https://civic-lens-ai-bay.vercel.app';
+const API_BASE = 'https://civiclens-backend-j5q2.onrender.com';
 
-// Injected JS: intercept blob URL creation for downloads and open in external browser instead
+// Injected JS: Override the handleExportPdf function so it sends a message
+// to React Native instead of trying to create a blob download link
 const INJECTED_JS = `
 (function() {
-  // Override the click-to-download pattern used for blob URLs
-  var origCreateObjectURL = URL.createObjectURL;
-  URL.createObjectURL = function(blob) {
-    var url = origCreateObjectURL.call(URL, blob);
-    // Store blob URLs so we can identify them
-    window.__blobUrls = window.__blobUrls || [];
-    window.__blobUrls.push(url);
-    return url;
-  };
-
-  // Intercept link clicks that target blob URLs
-  document.addEventListener('click', function(e) {
-    var link = e.target.closest('a');
-    if (link && link.href && link.href.startsWith('blob:')) {
-      e.preventDefault();
-      e.stopPropagation();
-      window.ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'blob_download',
-        message: 'PDF downloads are not supported in the mobile app. Please use the website to download reports.'
-      }));
+  // Intercept dynamically created <a> elements with download attribute
+  // The frontend creates: <a href="blob:..." download="amendment-X-report.pdf">
+  var origClick = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function() {
+    if (this.hasAttribute('download') && this.href && this.href.startsWith('blob:')) {
+      // Extract amendment ID from the download filename
+      var downloadAttr = this.getAttribute('download') || '';
+      var match = downloadAttr.match(/amendment-(\\d+)/);
+      var amendmentId = match ? match[1] : null;
+      var token = localStorage.getItem('token') || '';
+      
+      if (amendmentId) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'pdf_download',
+          amendmentId: amendmentId,
+          token: token
+        }));
+        return; // Don't actually click the blob link
+      }
     }
-  }, true);
+    return origClick.apply(this, arguments);
+  };
 })();
 true;
 `;
@@ -50,6 +53,7 @@ export default function Index() {
   const [canGoBack, setCanGoBack] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Handle Android hardware back button
   useEffect(() => {
@@ -58,9 +62,9 @@ export default function Index() {
     const onBackPress = () => {
       if (canGoBack && webViewRef.current) {
         webViewRef.current.goBack();
-        return true; // prevent default (exit app)
+        return true;
       }
-      return false; // allow default (exit app)
+      return false;
     };
 
     const subscription = BackHandler.addEventListener(
@@ -69,6 +73,57 @@ export default function Index() {
     );
     return () => subscription.remove();
   }, [canGoBack]);
+
+  // Native PDF download handler
+  const handlePdfDownload = async (amendmentId: string, token: string) => {
+    if (downloading) return;
+    setDownloading(true);
+
+    try {
+      const url = `${API_BASE}/api/amendments/${amendmentId}/report/pdf`;
+      const filename = `civiclens-amendment-${amendmentId}-report.pdf`;
+      const fileUri = `${FileSystem.cacheDirectory}${filename}`;
+
+      const downloadResult = await FileSystem.downloadAsync(url, fileUri, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+          Accept: 'application/pdf',
+        },
+      });
+
+      if (downloadResult.status === 200) {
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(downloadResult.uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Save CivicLens Report',
+            UTI: 'com.adobe.pdf',
+          });
+        } else {
+          Alert.alert('Downloaded', 'Report saved successfully.');
+        }
+      } else {
+        Alert.alert('Download Failed', 'Could not download the report.');
+      }
+    } catch (err) {
+      console.error('PDF download error:', err);
+      Alert.alert('Download Error', 'Something went wrong. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  // Handle messages from the WebView
+  const handleMessage = (event: any) => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.type === 'pdf_download' && data.amendmentId) {
+        handlePdfDownload(data.amendmentId, data.token);
+      }
+    } catch (e) {
+      // ignore non-JSON messages
+    }
+  };
 
   if (error) {
     return (
@@ -109,6 +164,14 @@ export default function Index() {
           </View>
         </View>
       )}
+
+      {downloading && (
+        <View style={styles.downloadBanner}>
+          <ActivityIndicator size="small" color="#0a0f1a" />
+          <Text style={styles.downloadText}>Downloading report...</Text>
+        </View>
+      )}
+
       <WebView
         ref={webViewRef}
         source={{ uri: WEBAPP_URL }}
@@ -127,38 +190,14 @@ export default function Index() {
         onNavigationStateChange={(navState) => {
           setCanGoBack(navState.canGoBack);
         }}
-        // Block blob: URL navigation (WebView can't handle these)
         onShouldStartLoadWithRequest={(request) => {
           if (request.url.startsWith('blob:')) {
-            return false; // silently block
+            return false;
           }
-          // Allow all other URLs
           return true;
         }}
-        // Inject JS to intercept blob download links
         injectedJavaScript={INJECTED_JS}
-        // Handle messages from injected JS
-        onMessage={(event) => {
-          try {
-            const data = JSON.parse(event.nativeEvent.data);
-            if (data.type === 'blob_download') {
-              Alert.alert(
-                'Download Not Available',
-                'PDF report downloads are not available in the mobile app. Please visit the website in a browser to download reports.',
-                [
-                  { text: 'OK' },
-                  {
-                    text: 'Open in Browser',
-                    onPress: () => Linking.openURL(WEBAPP_URL),
-                  },
-                ]
-              );
-            }
-          } catch (e) {
-            // ignore non-JSON messages
-          }
-        }}
-        // Performance & UX settings
+        onMessage={handleMessage}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         startInLoadingState={false}
@@ -168,12 +207,9 @@ export default function Index() {
         sharedCookiesEnabled={true}
         thirdPartyCookiesEnabled={true}
         cacheEnabled={true}
-        // Prevent opening external browser
         setSupportMultipleWindows={false}
-        // Android-specific
         overScrollMode="never"
         textZoom={100}
-        // Pull to refresh
         pullToRefreshEnabled={true}
       />
     </SafeAreaView>
@@ -222,6 +258,24 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontSize: 13,
     marginTop: 8,
+  },
+  downloadBanner: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 20,
+    backgroundColor: '#c8ee44',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 8,
+  },
+  downloadText: {
+    color: '#0a0f1a',
+    fontSize: 13,
+    fontWeight: '600',
   },
   errorContainer: {
     flex: 1,
