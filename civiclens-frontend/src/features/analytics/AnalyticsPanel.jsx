@@ -70,7 +70,7 @@ export default function AnalyticsPanel({ amendmentId }) {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="glass-card p-6 flex items-center justify-center">
+        <div className="glass-card p-5 sm:p-6 flex items-center justify-center">
           <LoadingSpinner size="md" />
         </div>
       </div>
@@ -80,11 +80,11 @@ export default function AnalyticsPanel({ amendmentId }) {
   const hasData = analytics && analytics.totalComments > 0
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-dark-100 flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8ee44" strokeWidth="2">
+        <h3 className="text-base sm:text-lg font-bold text-dark-100 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c8ee44" strokeWidth="2" className="sm:w-5 sm:h-5">
             <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" />
             <path d="M7 14l4-4 4 4 6-6" />
           </svg>
@@ -95,12 +95,12 @@ export default function AnalyticsPanel({ amendmentId }) {
             <button
               onClick={handleReanalyze}
               disabled={analyzing}
-              className="btn-ghost text-xs disabled:opacity-50 flex items-center gap-1.5"
+              className="btn-ghost text-[10px] sm:text-xs disabled:opacity-50 flex items-center gap-1 sm:gap-1.5"
             >
               {analyzing ? (
                 <LoadingSpinner size="sm" />
               ) : (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-[14px] sm:h-[14px]">
                   <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
                   <path d="M21 3v5h-5" />
                 </svg>
@@ -112,19 +112,19 @@ export default function AnalyticsPanel({ amendmentId }) {
       </div>
 
       {!hasData ? (
-        <div className="glass-card p-8 text-center">
-          <div className="text-4xl mb-3">🔬</div>
-          <h4 className="text-dark-200 font-semibold mb-2">No Analysis Available</h4>
-          <p className="text-sm text-dark-400 mb-4">
+        <div className="glass-card p-6 sm:p-8 text-center">
+          <div className="text-3xl sm:text-4xl mb-3">🔬</div>
+          <h4 className="text-dark-200 font-semibold mb-2 text-sm sm:text-base">No Analysis Available</h4>
+          <p className="text-xs sm:text-sm text-dark-400 mb-4">
             Click below to run AI analysis on the existing comments.
           </p>
           {isAdmin && (
-            <button onClick={handleReanalyze} disabled={analyzing} className="btn-primary text-sm">
+            <button onClick={handleReanalyze} disabled={analyzing} className="btn-primary text-xs sm:text-sm">
               {analyzing ? 'Analyzing...' : 'Generate Analysis'}
             </button>
           )}
           {error && (
-            <div className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-left">
+            <div className="mt-4 p-2.5 sm:p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] sm:text-xs text-left">
               ⚠️ {error}
             </div>
           )}
@@ -161,7 +161,7 @@ export default function AnalyticsPanel({ amendmentId }) {
           <button
             onClick={handleExportPdf}
             disabled={exporting}
-            className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
+            className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 text-xs sm:text-sm"
           >
             {exporting ? (
               <>
@@ -170,7 +170,7 @@ export default function AnalyticsPanel({ amendmentId }) {
               </>
             ) : (
               <>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="sm:w-4 sm:h-4">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <path d="M14 2v6h6" />
                   <path d="M12 18v-6M9 15l3 3 3-3" />

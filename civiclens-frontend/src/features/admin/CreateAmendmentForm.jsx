@@ -52,34 +52,34 @@ export default function CreateAmendmentForm({ onCreated }) {
   }
 
   return (
-    <div className="glass-card p-6">
-      <h3 className="section-title flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c8ee44" strokeWidth="2">
+    <div className="glass-card p-4 sm:p-6">
+      <h3 className="section-title flex items-center gap-2 text-sm sm:text-lg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8ee44" strokeWidth="2" className="sm:w-[18px] sm:h-[18px]">
           <path d="M12 5v14M5 12h14" />
         </svg>
         Create New Amendment
       </h3>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm">
+          <div className="p-2.5 sm:p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs sm:text-sm">
             {error}
           </div>
         )}
         {success && (
-          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-sm">
+          <div className="p-2.5 sm:p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs sm:text-sm">
             ✓ Amendment created successfully!
           </div>
         )}
 
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-dark-300 mb-2">Title</label>
+          <label className="block text-xs sm:text-sm font-medium text-dark-300 mb-1.5 sm:mb-2">Title</label>
           <input
             type="text"
             value={form.title}
             onChange={(e) => handleChange('title', e.target.value)}
-            className="input-field"
+            className="input-field text-sm"
             placeholder="E.g., Environmental Protection Clause"
             required
           />
@@ -87,25 +87,25 @@ export default function CreateAmendmentForm({ onCreated }) {
 
         {/* Body */}
         <div>
-          <label className="block text-sm font-medium text-dark-300 mb-2">Amendment Text</label>
+          <label className="block text-xs sm:text-sm font-medium text-dark-300 mb-1.5 sm:mb-2">Amendment Text</label>
           <textarea
             value={form.body}
             onChange={(e) => handleChange('body', e.target.value)}
-            className="input-field min-h-[150px] resize-y"
+            className="input-field min-h-[120px] sm:min-h-[150px] resize-y text-sm"
             placeholder="Full text of the proposed amendment..."
             required
           />
         </div>
 
         {/* Category + Timer row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">Category</label>
+            <label className="block text-xs sm:text-sm font-medium text-dark-300 mb-1.5 sm:mb-2">Category</label>
             <div className="relative">
               <select
                 value={form.category}
                 onChange={(e) => handleChange('category', e.target.value)}
-                className="input-field appearance-none pr-10"
+                className="input-field appearance-none pr-10 text-sm"
               >
                 {CATEGORIES.map(cat => (
                   <option key={cat} value={cat}>{cat.replace('_', ' ')}</option>
@@ -120,12 +120,12 @@ export default function CreateAmendmentForm({ onCreated }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-dark-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-dark-300 mb-1.5 sm:mb-2">
               Closes At
               <button
                 type="button"
                 onClick={() => handleChange('closesAt', defaultClosesAt())}
-                className="ml-2 text-xs text-civic-400 hover:text-civic-300"
+                className="ml-2 text-[10px] sm:text-xs text-civic-400 hover:text-civic-300"
               >
                 (Set 7 days)
               </button>
@@ -134,7 +134,7 @@ export default function CreateAmendmentForm({ onCreated }) {
               type="datetime-local"
               value={form.closesAt}
               onChange={(e) => handleChange('closesAt', e.target.value)}
-              className="input-field"
+              className="input-field text-sm"
               min={new Date().toISOString().slice(0, 16)}
             />
           </div>
@@ -143,7 +143,7 @@ export default function CreateAmendmentForm({ onCreated }) {
         <button
           type="submit"
           disabled={loading}
-          className="btn-primary w-full disabled:opacity-50"
+          className="btn-primary w-full disabled:opacity-50 text-sm"
         >
           {loading ? 'Creating...' : 'Create Amendment'}
         </button>

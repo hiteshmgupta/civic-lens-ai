@@ -47,49 +47,49 @@ export default function CommentSection({ amendmentId, status }) {
   const isClosed = status === 'CLOSED'
 
   return (
-    <div className="space-y-4">
-      <h3 className="section-title flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-civic-400">
+    <div className="space-y-3 sm:space-y-4">
+      <h3 className="section-title flex items-center gap-2 text-base sm:text-lg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-civic-400 sm:w-[18px] sm:h-[18px]">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
         Expert Discussion
-        <span className="text-sm font-normal text-dark-500">({comments.length})</span>
+        <span className="text-xs sm:text-sm font-normal text-dark-500">({comments.length})</span>
       </h3>
 
       {/* Comment Input */}
       {user && !isClosed ? (
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-2 sm:space-y-3">
           <div className="relative">
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Share your analysis or perspective on this amendment..."
-              className="input-field min-h-[100px] resize-y"
+              className="input-field min-h-[80px] sm:min-h-[100px] resize-y text-sm"
               maxLength={2000}
             />
-            <span className="absolute bottom-3 right-3 text-xs text-dark-600">
+            <span className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 text-[10px] sm:text-xs text-dark-600">
               {body.length}/2000
             </span>
           </div>
           {error && (
-            <p className="text-sm text-rose-400">{error}</p>
+            <p className="text-xs sm:text-sm text-rose-400">{error}</p>
           )}
           <div className="flex justify-end">
             <button
               type="submit"
               disabled={!body.trim() || submitting}
-              className="btn-primary text-sm disabled:opacity-50"
+              className="btn-primary text-xs sm:text-sm disabled:opacity-50"
             >
               {submitting ? 'Posting...' : 'Post Comment'}
             </button>
           </div>
         </form>
       ) : isClosed ? (
-        <div className="glass-card p-4 text-center text-sm text-dark-400">
+        <div className="glass-card p-3 sm:p-4 text-center text-xs sm:text-sm text-dark-400">
           This amendment is closed. Comments are no longer accepted.
         </div>
       ) : (
-        <div className="glass-card p-4 text-center text-sm text-dark-400">
+        <div className="glass-card p-3 sm:p-4 text-center text-xs sm:text-sm text-dark-400">
           <a href="/login" className="text-civic-400 hover:text-civic-300">Sign in</a> to add your comment.
         </div>
       )}
@@ -98,7 +98,7 @@ export default function CommentSection({ amendmentId, status }) {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="glass-card p-4 animate-pulse">
+            <div key={i} className="glass-card p-3 sm:p-4 animate-pulse">
               <div className="h-4 bg-dark-700 rounded w-1/4 mb-3" />
               <div className="h-3 bg-dark-800 rounded w-3/4 mb-2" />
               <div className="h-3 bg-dark-800 rounded w-1/2" />
@@ -106,9 +106,9 @@ export default function CommentSection({ amendmentId, status }) {
           ))}
         </div>
       ) : comments.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-6 sm:p-8 text-center">
           <div className="text-3xl mb-2">💬</div>
-          <p className="text-sm text-dark-400">No comments yet. Be the first to share your perspective.</p>
+          <p className="text-xs sm:text-sm text-dark-400">No comments yet. Be the first to share your perspective.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -123,8 +123,8 @@ export default function CommentSection({ amendmentId, status }) {
 
 function CommentItem({ comment }) {
   return (
-    <div className="glass-card p-4 animate-slide-up">
-      <div className="flex gap-3">
+    <div className="glass-card p-3 sm:p-4 animate-slide-up">
+      <div className="flex gap-2 sm:gap-3">
         {/* Vote Controls */}
         <div className="flex-shrink-0 pt-0.5">
           <VoteControls
@@ -137,18 +137,18 @@ function CommentItem({ comment }) {
 
         {/* Comment Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 bg-dark-700 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-semibold text-civic-400">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 bg-dark-700 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-[10px] sm:text-xs font-semibold text-civic-400">
                 {comment.username?.charAt(0).toUpperCase() || '?'}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-dark-200">{comment.username}</span>
-              <span className="text-xs text-dark-500">{formatDateTime(comment.createdAt)}</span>
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+              <span className="text-xs sm:text-sm font-medium text-dark-200">{comment.username}</span>
+              <span className="text-[10px] sm:text-xs text-dark-500">{formatDateTime(comment.createdAt)}</span>
             </div>
           </div>
-          <p className="text-sm text-dark-300 leading-relaxed">{comment.body}</p>
+          <p className="text-xs sm:text-sm text-dark-300 leading-relaxed">{comment.body}</p>
         </div>
       </div>
     </div>

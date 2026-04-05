@@ -19,21 +19,21 @@ export default function SentimentChart({ distribution }) {
   if (total === 0) return <EmptyState />
 
   return (
-    <div className="glass-card p-5">
-      <h4 className="text-sm font-semibold text-dark-200 mb-4 flex items-center gap-2">
+    <div className="glass-card p-4 sm:p-5">
+      <h4 className="text-xs sm:text-sm font-semibold text-dark-200 mb-3 sm:mb-4 flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-civic-400" />
         Sentiment Distribution
       </h4>
-      <div className="flex items-center gap-6">
-        <div className="w-32 h-32 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+        <div className="w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={32}
-                outerRadius={56}
+                innerRadius={28}
+                outerRadius={50}
                 paddingAngle={3}
                 dataKey="value"
                 strokeWidth={0}
@@ -54,16 +54,16 @@ export default function SentimentChart({ distribution }) {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex flex-col gap-2.5 flex-1">
+        <div className="flex flex-col gap-2 sm:gap-2.5 flex-1 w-full sm:w-auto">
           {data.map((item) => (
             <div key={item.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                <span className="text-sm text-dark-300">{item.name}</span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                <span className="text-xs sm:text-sm text-dark-300">{item.name}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-dark-100">{item.value}</span>
-                <span className="text-xs text-dark-500">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="text-xs sm:text-sm font-semibold text-dark-100">{item.value}</span>
+                <span className="text-[10px] sm:text-xs text-dark-500">
                   ({((item.value / total) * 100).toFixed(0)}%)
                 </span>
               </div>
@@ -77,7 +77,7 @@ export default function SentimentChart({ distribution }) {
 
 function EmptyState() {
   return (
-    <div className="glass-card p-5 text-center text-sm text-dark-500">
+    <div className="glass-card p-4 sm:p-5 text-center text-xs sm:text-sm text-dark-500">
       No sentiment data available yet.
     </div>
   )

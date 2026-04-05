@@ -16,9 +16,9 @@ export default function GlobalSentimentOverview({ dashboard }) {
   const total = data.reduce((sum, d) => sum + d.value, 0)
 
   return (
-    <div className="glass-card p-6">
-      <h3 className="section-title flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c8ee44" strokeWidth="2">
+    <div className="glass-card p-4 sm:p-6">
+      <h3 className="section-title flex items-center gap-2 text-sm sm:text-lg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8ee44" strokeWidth="2" className="sm:w-[18px] sm:h-[18px]">
           <circle cx="12" cy="12" r="10" />
           <path d="M8 14s1.5 2 4 2 4-2 4-2" />
           <line x1="9" y1="9" x2="9.01" y2="9" />
@@ -28,20 +28,20 @@ export default function GlobalSentimentOverview({ dashboard }) {
       </h3>
 
       {total === 0 ? (
-        <div className="text-center text-sm text-dark-500 py-8">
+        <div className="text-center text-xs sm:text-sm text-dark-500 py-6 sm:py-8">
           No sentiment data available yet.
         </div>
       ) : (
-        <div className="flex items-center gap-6">
-          <div className="w-40 h-40 flex-shrink-0">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={data}
                   cx="50%"
                   cy="50%"
-                  innerRadius={40}
-                  outerRadius={65}
+                  innerRadius={32}
+                  outerRadius={55}
                   paddingAngle={3}
                   dataKey="value"
                   strokeWidth={0}
@@ -62,19 +62,19 @@ export default function GlobalSentimentOverview({ dashboard }) {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex-1 space-y-3">
+          <div className="flex-1 space-y-2.5 sm:space-y-3 w-full">
             {data.map((item, idx) => {
               const pct = ((item.value / total) * 100).toFixed(1)
               return (
                 <div key={item.name}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[idx] }} />
-                      <span className="text-sm text-dark-300">{item.name}</span>
+                      <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: COLORS[idx] }} />
+                      <span className="text-xs sm:text-sm text-dark-300">{item.name}</span>
                     </div>
-                    <span className="text-sm font-semibold text-dark-100">{pct}%</span>
+                    <span className="text-xs sm:text-sm font-semibold text-dark-100">{pct}%</span>
                   </div>
-                  <div className="h-1.5 bg-dark-800 rounded-full overflow-hidden">
+                  <div className="h-1 sm:h-1.5 bg-dark-800 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-700"
                       style={{ width: `${pct}%`, backgroundColor: COLORS[idx] }}
@@ -84,7 +84,7 @@ export default function GlobalSentimentOverview({ dashboard }) {
               )
             })}
             <div className="pt-2 border-t border-dark-700/50">
-              <span className="text-xs text-dark-500">
+              <span className="text-[10px] sm:text-xs text-dark-500">
                 Total Comments: <span className="text-dark-300 font-semibold">{totalComments?.toLocaleString()}</span>
               </span>
             </div>
