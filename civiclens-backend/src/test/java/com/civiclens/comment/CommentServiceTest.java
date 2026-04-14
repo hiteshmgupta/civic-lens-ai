@@ -64,9 +64,7 @@ class CommentServiceTest {
         return req;
     }
 
-    // ---------------------------------------------------------------
     // Create comment
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Create comment — success on active amendment")
@@ -106,9 +104,7 @@ class CommentServiceTest {
                 commentService.create(999L, commentRequest("Hello"), "test@example.com"));
     }
 
-    // ---------------------------------------------------------------
     // List comments
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("List comments — returns paginated response")

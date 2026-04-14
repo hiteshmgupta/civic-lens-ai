@@ -1,6 +1,6 @@
 """
 CivicLens Dataset Preparation Script
-=====================================
+
 Generates curated comments for 7 real-world legislative amendments with
 realistic synthetic vote data for the CivicLens platform.
 
@@ -21,9 +21,7 @@ import random
 
 random.seed(42)
 
-# ---------------------------------------------------------------------------
 # SYNTHETIC USERS (20 users to distribute comments and votes)
-# ---------------------------------------------------------------------------
 USERS = [
     {"username": "digital_rights_advocate", "email": "digital_advocate@civiclens.com"},
     {"username": "telecom_policy_analyst", "email": "telecom_analyst@civiclens.com"},
@@ -47,9 +45,7 @@ USERS = [
     {"username": "cybersecurity_pro", "email": "cybersecpro@civiclens.com"},
 ]
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 1: Net Neutrality (DIGITAL_PRIVACY) — ~35 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 1: Net Neutrality (DIGITAL_PRIVACY)
 AMENDMENT_1 = {
     "title": "Restoring Internet Freedom Act — Repeal of Net Neutrality Rules",
     "body": (
@@ -102,9 +98,7 @@ AMENDMENT_1 = {
     ]
 }
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 2: Clean Air and Climate Action (ENVIRONMENT) — ~30 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 2: Clean Air and Climate Action (ENVIRONMENT)
 AMENDMENT_2 = {
     "title": "Clean Air and Climate Accountability Act Amendment",
     "body": (
@@ -146,9 +140,7 @@ AMENDMENT_2 = {
     ]
 }
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 3: Rural Broadband (INFRASTRUCTURE) — ~30 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 3: Rural Broadband (INFRASTRUCTURE)
 AMENDMENT_3 = {
     "title": "Digital Infrastructure and Rural Broadband Expansion Act",
     "body": (
@@ -187,9 +179,7 @@ AMENDMENT_3 = {
     ]
 }
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 4: Healthcare Data Privacy (HEALTHCARE) — ~30 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 4: Healthcare Data Privacy (HEALTHCARE)
 AMENDMENT_4 = {
     "title": "Healthcare Data Privacy and Patient Rights Enhancement Act",
     "body": (
@@ -229,9 +219,7 @@ AMENDMENT_4 = {
     ]
 }
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 5: Student Digital Privacy (EDUCATION) — ~30 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 5: Student Digital Privacy (EDUCATION)
 AMENDMENT_5 = {
     "title": "Student Digital Privacy and Educational Technology Accountability Act",
     "body": (
@@ -269,9 +257,7 @@ AMENDMENT_5 = {
     ]
 }
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 6: Tax Reform for Small Businesses (TAXATION) — ~30 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 6: Tax Reform for Small Businesses (TAXATION)
 AMENDMENT_6 = {
     "title": "Small Business Tax Fairness and Economic Opportunity Act",
     "body": (
@@ -309,9 +295,7 @@ AMENDMENT_6 = {
     ]
 }
 
-# ---------------------------------------------------------------------------
-# AMENDMENT 7: National Defense and Cybersecurity (DEFENSE) — ~30 comments
-# ---------------------------------------------------------------------------
+# AMENDMENT 7: National Defense and Cybersecurity (DEFENSE)
 AMENDMENT_7 = {
     "title": "National Cybersecurity Infrastructure and Critical Defense Systems Act",
     "body": (
@@ -352,9 +336,7 @@ AMENDMENT_7 = {
 }
 
 
-# ---------------------------------------------------------------------------
 # VOTE GENERATION
-# ---------------------------------------------------------------------------
 def generate_votes(comments: list) -> list:
     """
     Generate realistic synthetic upvotes/downvotes per comment.
@@ -390,9 +372,7 @@ def generate_votes(comments: list) -> list:
     return comments
 
 
-# ---------------------------------------------------------------------------
 # BUILD AND WRITE DATASET
-# ---------------------------------------------------------------------------
 def main():
     all_amendments = [AMENDMENT_1, AMENDMENT_2, AMENDMENT_3, AMENDMENT_4, AMENDMENT_5, AMENDMENT_6, AMENDMENT_7]
 

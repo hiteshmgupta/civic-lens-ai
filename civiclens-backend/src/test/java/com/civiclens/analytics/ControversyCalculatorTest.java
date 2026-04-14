@@ -22,9 +22,7 @@ class ControversyCalculatorTest {
         calculator = new ControversyCalculator();
     }
 
-    // ---------------------------------------------------------------
     // Vote Polarity: P = 1 − |U − D| / (U + D) ∈ [0,1]
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("P = 1.0 when votes are perfectly split (50/50)")
@@ -53,9 +51,7 @@ class ControversyCalculatorTest {
         assertEquals(0.8, p, 1e-9);
     }
 
-    // ---------------------------------------------------------------
     // Sentiment Variance: S = σ² ∈ [0,1]
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("S = 0.0 for empty scores array")
@@ -85,9 +81,7 @@ class ControversyCalculatorTest {
         assertTrue(s >= 0 && s <= 1.0, "Variance should be in [0,1], got: " + s);
     }
 
-    // ---------------------------------------------------------------
     // Sentiment Mean
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Mean of empty scores is 0")
@@ -102,9 +96,7 @@ class ControversyCalculatorTest {
         assertEquals(0.5, calculator.sentimentMean(new double[] { 0.0, 1.0 }), 1e-9);
     }
 
-    // ---------------------------------------------------------------
     // Stance Entropy: D = H / log(K) ∈ [0,1]
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("D = 1.0 for perfectly even distribution")
@@ -141,9 +133,7 @@ class ControversyCalculatorTest {
         assertTrue(d > 0 && d < 1.0, "Entropy should be in (0,1) for skewed case, got: " + d);
     }
 
-    // ---------------------------------------------------------------
     // Engagement Intensity: E = log(1+n) / log(1+n_max) ∈ [0,1]
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("E = 0.0 when no comments")
@@ -170,9 +160,7 @@ class ControversyCalculatorTest {
         assertTrue(e > 0 && e < 1.0, "Engagement should be in (0,1), got: " + e);
     }
 
-    // ---------------------------------------------------------------
     // Controversy Score: C(a) = S · P · D · √E ∈ [0,1]
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("C is non-zero because it's an average now")
@@ -193,9 +181,7 @@ class ControversyCalculatorTest {
         assertTrue(c >= 0 && c <= 1.0, "Score should be in [0,1], got: " + c);
     }
 
-    // ---------------------------------------------------------------
     // Controversy Label thresholds
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Labels map correctly to score ranges")

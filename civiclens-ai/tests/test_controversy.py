@@ -15,9 +15,7 @@ from models.controversy import (
 )
 
 
-# ---------------------------------------------------------------
 # Vote Polarity: P = 1 − |U − D| / (U + D) ∈ [0,1]
-# ---------------------------------------------------------------
 
 class TestVotePolarity:
     def test_even_split_returns_one(self):
@@ -35,9 +33,7 @@ class TestVotePolarity:
         assert vote_polarity(60, 40) == pytest.approx(0.8)
 
 
-# ---------------------------------------------------------------
 # Sentiment Variance: S = σ² ∈ [0,1]
-# ---------------------------------------------------------------
 
 class TestSentimentVariance:
     def test_empty_returns_zero(self):
@@ -55,9 +51,7 @@ class TestSentimentVariance:
         assert 0 <= s <= 1.0
 
 
-# ---------------------------------------------------------------
 # Sentiment Mean
-# ---------------------------------------------------------------
 
 class TestSentimentMean:
     def test_empty_returns_zero(self):
@@ -67,9 +61,7 @@ class TestSentimentMean:
         assert sentiment_mean([0.0, 1.0]) == pytest.approx(0.5)
 
 
-# ---------------------------------------------------------------
 # Stance Entropy: D = H / log(K) ∈ [0,1]
-# ---------------------------------------------------------------
 
 class TestStanceEntropy:
     def test_even_distribution_returns_one(self):
@@ -88,9 +80,7 @@ class TestStanceEntropy:
         assert 0 < d < 1.0
 
 
-# ---------------------------------------------------------------
 # Engagement Intensity: E = log(1+n) / log(1+n_max) ∈ [0,1]
-# ---------------------------------------------------------------
 
 class TestEngagementIntensity:
     def test_zero_comments(self):
@@ -107,9 +97,7 @@ class TestEngagementIntensity:
         assert 0 < e < 1.0
 
 
-# ---------------------------------------------------------------
 # Controversy Score: C(a) = S · P · D · √E ∈ [0,1]
-# ---------------------------------------------------------------
 
 class TestControversyScore:
     def test_zero_component(self):
@@ -124,9 +112,7 @@ class TestControversyScore:
         assert 0 <= c <= 1.0
 
 
-# ---------------------------------------------------------------
 # Controversy Label
-# ---------------------------------------------------------------
 
 class TestControversyLabel:
     def test_all_thresholds(self):

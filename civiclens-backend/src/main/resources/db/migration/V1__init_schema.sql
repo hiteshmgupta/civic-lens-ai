@@ -1,9 +1,9 @@
 -- CivicLens — PostgreSQL Schema Initialization
 -- V1: Core tables for users, amendments, votes, comments, analytics
 
--- ============================================================
+
 -- 1. USERS
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS users (
     id             BIGSERIAL PRIMARY KEY,
     username       VARCHAR(50)  NOT NULL UNIQUE,
@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS users (
     created_at     TIMESTAMP    NOT NULL DEFAULT NOW()
 );
 
--- ============================================================
+
 -- 2. AMENDMENTS
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS amendments (
     id          BIGSERIAL    PRIMARY KEY,
     title       VARCHAR(500) NOT NULL,
@@ -30,9 +30,9 @@ CREATE TABLE IF NOT EXISTS amendments (
 CREATE INDEX IF NOT EXISTS idx_amendments_status ON amendments(status);
 CREATE INDEX IF NOT EXISTS idx_amendments_category ON amendments(category);
 
--- ============================================================
+
 -- 3. VOTES (unique constraint: one vote per user per amendment)
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS votes (
     id            BIGSERIAL PRIMARY KEY,
     user_id       BIGINT    NOT NULL REFERENCES users(id),
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS votes (
     UNIQUE(user_id, amendment_id)
 );
 
--- ============================================================
+
 -- 4. COMMENTS
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS comments (
     id            BIGSERIAL PRIMARY KEY,
     user_id       BIGINT    NOT NULL REFERENCES users(id),
@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS comments (
 
 CREATE INDEX IF NOT EXISTS idx_comments_amendment_id ON comments(amendment_id);
 
--- ============================================================
+
 -- 5. AMENDMENT ANALYTICS (one row per amendment)
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS amendment_analytics (
     id                     BIGSERIAL        PRIMARY KEY,
     amendment_id           BIGINT           NOT NULL UNIQUE REFERENCES amendments(id),
@@ -81,9 +81,8 @@ CREATE TABLE IF NOT EXISTS amendment_analytics (
     last_computed_at       TIMESTAMP        DEFAULT NOW()
 );
 
--- ============================================================
+
 -- 6. SEED DATA (development only)
--- ============================================================
 
 -- Admin user (password: admin123 — BCrypt hash)
 INSERT INTO users (username, email, password_hash, role) VALUES

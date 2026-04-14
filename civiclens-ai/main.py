@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="CivicLens AI Service",
-    description="AI-powered legislative consultation analysis (HF Inference API)",
+    description="Legislative consultation analysis service (HF Inference API)",
     version="0.3.0",
     lifespan=lifespan,
 )

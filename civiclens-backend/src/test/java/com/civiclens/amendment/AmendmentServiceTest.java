@@ -58,9 +58,7 @@ class AmendmentServiceTest {
                 .createdBy(adminUser).build();
     }
 
-    // ---------------------------------------------------------------
     // Create
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Create amendment — success returns response and initializes analytics")
@@ -104,9 +102,7 @@ class AmendmentServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> amendmentService.create(request, "unknown@test.com"));
     }
 
-    // ---------------------------------------------------------------
     // Get by ID
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Get by ID — returns amendment response")
@@ -136,9 +132,7 @@ class AmendmentServiceTest {
                 amendmentService.getById(999L));
     }
 
-    // ---------------------------------------------------------------
     // List
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("List — returns paginated response with default sort")
@@ -173,9 +167,7 @@ class AmendmentServiceTest {
         verify(amendmentRepository).findByCategory(eq(AmendmentCategory.HEALTHCARE), any(Pageable.class));
     }
 
-    // ---------------------------------------------------------------
     // Update
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Update — success modifies title and body")

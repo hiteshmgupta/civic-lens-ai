@@ -37,12 +37,10 @@ export default function VoteControls({ commentId, upvotes: initUp, downvotes: in
     }
   }
 
-  const net = upvotes - downvotes
   const isVertical = layout === 'vertical'
 
   return (
     <div className={`flex items-center gap-1 ${isVertical ? 'flex-col' : 'flex-row'}`}>
-      {/* Upvote */}
       <button
         onClick={() => handleVote(1)}
         disabled={!user || loading}
@@ -58,14 +56,12 @@ export default function VoteControls({ commentId, upvotes: initUp, downvotes: in
         </svg>
       </button>
 
-      {/* Score */}
       <span className={`text-xs font-bold font-mono min-w-[2ch] text-center ${
-        net > 0 ? 'text-civic-400' : net < 0 ? 'text-rose-400' : 'text-dark-400'
+        upvotes > 0 ? 'text-civic-400' : 'text-dark-400'
       }`}>
-        {net > 0 ? `+${net}` : net}
+        {upvotes}
       </span>
 
-      {/* Downvote */}
       <button
         onClick={() => handleVote(-1)}
         disabled={!user || loading}
@@ -80,6 +76,12 @@ export default function VoteControls({ commentId, upvotes: initUp, downvotes: in
           <path d="M12 5v14M19 12l-7 7-7-7" />
         </svg>
       </button>
+
+      <span className={`text-xs font-bold font-mono min-w-[2ch] text-center ${
+        downvotes > 0 ? 'text-rose-400' : 'text-dark-400'
+      }`}>
+        {downvotes}
+      </span>
     </div>
   )
 }

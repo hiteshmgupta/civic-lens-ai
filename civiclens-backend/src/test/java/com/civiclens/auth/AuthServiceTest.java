@@ -54,9 +54,7 @@ class AuthServiceTest {
                 .build();
     }
 
-    // ---------------------------------------------------------------
     // Registration
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Register — success creates user and returns token")
@@ -98,9 +96,7 @@ class AuthServiceTest {
         verify(userRepository, never()).save(any());
     }
 
-    // ---------------------------------------------------------------
     // Login
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Login — success returns token")

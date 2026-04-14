@@ -35,13 +35,13 @@ public class AdminService {
         // All analytics records
         List<AmendmentAnalytics> allAnalytics = analyticsRepository.findAll();
 
-        // ─── Global sentiment mean ───
+        // Global sentiment mean
         double globalSentiment = allAnalytics.stream()
                 .filter(a -> a.getSentimentMean() != null)
                 .mapToDouble(AmendmentAnalytics::getSentimentMean)
                 .average().orElse(0.0);
 
-        // ─── Global sentiment distribution (aggregate per-amendment distributions) ───
+        // Aggregate sentiment distribution across all amendments
         Map<String, Long> globalSentimentDistribution = new LinkedHashMap<>();
         globalSentimentDistribution.put("positive", 0L);
         globalSentimentDistribution.put("negative", 0L);
@@ -59,7 +59,7 @@ public class AdminService {
             }
         }
 
-        // ─── Most controversial (top 5) ───
+        // Top 5 most controversial
         List<Map<String, Object>> mostControversial = allAnalytics.stream()
                 .filter(a -> a.getControversyScore() != null && a.getControversyScore() > 0)
                 .sorted((a, b) -> Double.compare(b.getControversyScore(), a.getControversyScore()))
@@ -77,7 +77,7 @@ public class AdminService {
                 })
                 .collect(Collectors.toList());
 
-        // ─── Participation trend (comments + votes grouped by month) ───
+        // Monthly participation trends
         Map<String, Long> commentsByMonth = new LinkedHashMap<>();
         try {
             List<Object[]> commentCounts = commentRepository.countGroupedByMonth();
@@ -117,7 +117,7 @@ public class AdminService {
                 })
                 .collect(Collectors.toList());
 
-        // ─── Topic distribution across all amendments ───
+        // Topic distribution
         Map<String, Long> topicDist = new LinkedHashMap<>();
         allAnalytics.stream()
                 .filter(a -> a.getTopicClusters() != null)

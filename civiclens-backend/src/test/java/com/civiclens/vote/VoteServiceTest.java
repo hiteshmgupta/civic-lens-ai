@@ -67,9 +67,7 @@ class VoteServiceTest {
         return req;
     }
 
-    // ---------------------------------------------------------------
     // Cast vote
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Vote — new upvote is saved")
@@ -138,9 +136,7 @@ class VoteServiceTest {
                 voteService.vote(999L, voteRequest((short) 1), "test@example.com"));
     }
 
-    // ---------------------------------------------------------------
     // Remove vote
-    // ---------------------------------------------------------------
 
     @Test
     @DisplayName("Remove vote — success deletes vote")

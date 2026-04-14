@@ -1,119 +1,75 @@
-# CivicLens — AI-Powered Legislative Consultation Intelligence Platform
+# CivicLens
 
-CivicLens analyzes public feedback on proposed legislation using AI. Citizens can read amendments, vote, comment, and see real-time sentiment analysis. Administrators get an intelligence dashboard with controversy scores, participation trends, and AI-generated policy briefs.
+A platform where citizens can read proposed legislative amendments, vote on them, leave comments, and see how the public feels through sentiment analysis. Admins get a dashboard showing trends, controversy scores, and auto-generated policy briefs.
 
-> **Live Site:** [civic-lens-ai-bay.vercel.app](https://civic-lens-ai-bay.vercel.app)
->
-> **First time?** See the [Complete Setup & Installation Guide (SETUP.md)](SETUP.md) for step-by-step installation of every tool with exact versions.
+Built as an academic project.
 
----
-
-## Quick Start
-
-### Option 1 — Use the Live Website (No Installation Needed)
-
-Everything is already deployed and running. Just open the link:
-
-**→ [civic-lens-ai-bay.vercel.app](https://civic-lens-ai-bay.vercel.app)**
-
-| Service | URL | Host |
-|---|---|---|
-| **Frontend** | [civic-lens-ai-bay.vercel.app](https://civic-lens-ai-bay.vercel.app) | Vercel |
-| **Backend API** | `civiclens-backend-j5q2.onrender.com` | Render |
-| **AI Service** | Render (internal) | Render |
-
-**Demo Accounts:**
-
-> ⚠️ These are pre-seeded demo credentials for the **live demo only**. They are not used in any production deployment. Always use strong, unique credentials in production.
-
-| Role | Email | Password |
-|---|---|---|
-| Admin | `admin@gmail.com` | `admin@123` |
-| User | `user@gmail.com` | `user@123` |
-
-> The backend runs on Render's free tier — the first request may take ~30 seconds if the server has been idle.
+> **Live demo:** [civic-lens-ai-bay.vercel.app](https://civic-lens-ai-bay.vercel.app)
 
 ---
 
-### Option 2 — Run Everything Locally
+## Tech Stack
 
-#### Prerequisites — What to Install
+- **Frontend** — React + Vite + Tailwind CSS (hosted on Vercel)
+- **Backend** — Spring Boot 4 + Spring Security + JPA (hosted on Render)
+- **AI Service** — Python FastAPI microservice using HuggingFace models (hosted on Render)
+- **Mobile** — React Native Expo wrapper with WebView
+- **Database** — PostgreSQL (Render managed)
 
-| Tool | Version Used | Download Link | How to Verify |
-|---|---|---|---|
-| **Java (JDK)** | 21 | [adoptium.net](https://adoptium.net/) | `java --version` → should show 21+ |
-| **Maven** | 3.9+ | [maven.apache.org](https://maven.apache.org/download.cgi) | `mvn --version` → should show 3.9+ |
-| **Node.js** | 18+ (LTS) | [nodejs.org](https://nodejs.org/) | `node --version` → should show v18+ |
-| **npm** | 9+ | Comes with Node.js | `npm --version` → should show 9+ |
-| **Python** | 3.11+ | [python.org/downloads](https://www.python.org/downloads/) | `python --version` → should show 3.11+ |
-| **Git** | Any | [git-scm.com](https://git-scm.com/) | `git --version` |
+---
 
-#### Step 1 — Clone the Repository
+## Features
+
+- Sentiment analysis on every comment (positive / negative / neutral)
+- Controversy scoring using a custom formula: `C(a) = S · P · D · √E`
+- Topic extraction using TF-IDF + KMeans clustering
+- Zero-shot argument classification (support / oppose / neutral)
+- Automated policy brief generation (BART-large-CNN)
+- Admin dashboard with global analytics
+- PDF report export
+- Mobile app (Android APK via Expo EAS)
+
+---
+
+## How to Run Locally
+
+You need: **Java 21**, **Maven 3.9+**, **Node.js 18+**, **Python 3.11+**, **Git**
 
 ```bash
+# Clone
 git clone https://github.com/hiteshmgupta/civic-lens-ai.git
 cd civic-lens-ai
 ```
 
-#### Step 2 — Start the Backend
-
+**Terminal 1 — Backend:**
 ```bash
 cd civiclens-backend
 mvn spring-boot:run
+# Runs on http://localhost:8080
 ```
 
-This will:
-- Download all Java dependencies automatically (first run takes a few minutes)
-- Seed demo accounts and sample data
-- Start the API on **http://localhost:8080**
-
-#### Step 3 — Start the AI Service
-
+**Terminal 2 — AI Service:**
 ```bash
 cd civiclens-ai
-
-# Create virtual environment
 python -m venv .venv
-
-# Activate it
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS/Linux
-
-# Install Python packages
+.venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-
-# Set your HuggingFace API token (get a free one at https://huggingface.co/settings/tokens)
-set HF_API_TOKEN=hf_your_token_here          # Windows CMD
-# $env:HF_API_TOKEN="hf_your_token_here"     # Windows PowerShell
-# export HF_API_TOKEN=hf_your_token_here      # macOS/Linux
-
-# Start the server
+set HF_API_TOKEN=your_token   # Get free token from huggingface.co/settings/tokens
 python -m uvicorn main:app --port 8000
+# Runs on http://localhost:8000
 ```
 
-The AI service runs on **http://localhost:8000**. Health check: `http://localhost:8000/ai/health`
-
-#### Step 4 — Start the Frontend
-
+**Terminal 3 — Frontend:**
 ```bash
 cd civiclens-frontend
-
-# Install Node.js packages
 npm install
-
-# Start the dev server
 npm run dev
+# Runs on http://localhost:5173
 ```
 
-The frontend runs on **http://localhost:5173**. The Vite dev proxy automatically forwards `/api` requests to `localhost:8080`.
+**Demo login:** `admin@gmail.com` / `admin@123` (admin) or `user@gmail.com` / `user@123` (user)
 
-#### Summary — All Three Services Running
-
-| Service | Command | URL |
-|---|---|---|
-| Backend | `mvn spring-boot:run` | http://localhost:8080 |
-| AI Service | `python -m uvicorn main:app --port 8000` | http://localhost:8000 |
-| Frontend | `npm run dev` | http://localhost:5173 |
+> Backend on Render free tier may take ~30s to wake up on first request.
 
 ---
 
@@ -121,190 +77,37 @@ The frontend runs on **http://localhost:5173**. The Vite dev proxy automatically
 
 ```
 civic-lens-ai/
-├── civiclens-frontend/   → React + Vite + Tailwind CSS (deployed on Vercel)
-├── civiclens-backend/    → Spring Boot REST API (deployed on Render)
-├── civiclens-ai/         → Python FastAPI AI microservice (deployed on Render)
-├── civiclens-mobile/     → React Native Expo app (WebView wrapper)
-├── scripts/              → Dataset preparation scripts — see [scripts/README.md](scripts/README.md)
-├── SETUP.md              → Complete installation guide
-└── CHANGELOG.md          → Version history
+├── civiclens-frontend/   React + Vite app
+├── civiclens-backend/    Spring Boot REST API
+├── civiclens-ai/         Python FastAPI service
+├── civiclens-mobile/     Expo mobile wrapper
+├── scripts/              Dataset prep scripts
+└── SETUP.md              Detailed setup guide
 ```
 
-### Dataset & Seeding
-
-The backend auto-seeds **7 real-world legislative amendments**, **220+ curated comments** with stance/sentiment metadata, **20 synthetic users**, and **realistic vote distributions** on every fresh start. The data is generated by `scripts/prepare_fcc_dataset.py` and loaded from `fcc_dataset.json`.
-
-→ See **[scripts/README.md](scripts/README.md)** for the full dataset guide: what's included, how to regenerate, and how to extend with new amendments and comments.
-
----
-
-## Exact Versions Used
-
-### Backend (`civiclens-backend`)
-
-| Dependency | Version |
-|---|---|
-| Java (JDK) | 21 |
-| Spring Boot | 4.0.0 |
-| Spring Security | (managed by Spring Boot) |
-| Spring Data JPA | (managed by Spring Boot) |
-| Lombok | 1.18.32 |
-| JJWT (JWT library) | 0.12.5 |
-| OpenHTMLtoPDF (PDF generation) | 1.0.10 |
-| Maven Compiler Plugin | 3.13.0 |
-
-### Frontend (`civiclens-frontend`)
-
-| Dependency | Version |
-|---|---|
-| React | 18.2.0 |
-| React DOM | 18.2.0 |
-| React Router DOM | 6.22.3 |
-| Axios | 1.6.7 |
-| Recharts | 2.12.2 |
-| Vite | 5.1.6 |
-| Tailwind CSS | 3.4.1 |
-| PostCSS | 8.4.35 |
-| Autoprefixer | 10.4.18 |
-
-### AI Service (`civiclens-ai`)
-
-| Dependency | Version Range |
-|---|---|
-| Python | 3.11+ |
-| FastAPI | ≥0.109.0, <1.0 |
-| Uvicorn | ≥0.27.0, <1.0 |
-| Pydantic | ≥2.6.0, <3.0 |
-| httpx | ≥0.27.0 |
-| scikit-learn | ≥1.4.0 |
-| NumPy | ≥1.26.0 |
-
-### Mobile App (`civiclens-mobile`)
-
-| Dependency | Version |
-|---|---|
-| Expo SDK | 54.0.33 |
-| React Native | 0.81.5 |
-| React | 19.1.0 |
-| react-native-webview | 13.15.0 |
-| react-native-safe-area-context | 5.6.0 |
-| expo-file-system | 19.0.21 |
-| expo-sharing | 14.0.8 |
-| Expo Router | 6.0.23 |
-| TypeScript | 5.9.2 |
-
----
-
-## Key Features
-
-- **Sentiment Analysis** — AI classifies every comment as positive/negative/neutral with continuous scores
-- **Controversy Index** — Custom formula combining sentiment variance, vote polarity, stance entropy, and engagement: `C(a) = S · P · D · √E`
-- **Topic Clustering** — TF-IDF + KMeans extracts key discussion themes from comments
-- **Argument Classification** — Zero-shot classification identifies supporting vs opposing arguments
-- **Policy Brief** — AI-generated summary of public feedback using BART-large-CNN
-- **Admin Dashboard** — Live stats, global sentiment overview, participation trends, most controversial amendments
-- **PDF Reports** — Export full analysis reports for offline review
-- **Mobile App** — Native Expo wrapper for Android/iOS
-
----
-
-## Mobile App
-
-The `civiclens-mobile/` folder contains a React Native Expo app that wraps the web frontend in a fullscreen WebView. It supports **native PDF report downloads** — reports download directly to your phone and open the share sheet.
-
-**Prerequisites:** Node.js 18+ (already installed if you set up the frontend)
-
-**To test with Expo Go (on your phone):**
-```bash
-cd civiclens-mobile
-npm install
-npx expo start
-# Scan the QR code with Expo Go app (Android) or Camera app (iOS)
-# Your phone and PC must be on the same Wi-Fi
-```
-
-**To build a standalone APK (runs without a PC):**
-```bash
-# Install EAS CLI globally (one-time)
-npm install -g eas-cli
-
-# Login to Expo (create free account at expo.dev if needed)
-eas login
-
-# Build the APK on Expo's cloud (no Android Studio needed)
-cd civiclens-mobile
-eas build -p android --profile preview
-
-# After ~10-15 min, you get a download link for the .apk file
-# Install it on any Android phone
-```
-
-> **Do I need to rebuild after every change?** No — the app loads the Vercel URL, so any web/backend changes are reflected instantly. Only rebuild if you change the native mobile wrapper code.
-
-See [`civiclens-mobile/README.md`](civiclens-mobile/README.md) for more details.
-
----
-
-## Environment Variables Reference
-
-### Backend (`civiclens-backend`)
-| Variable | Default | Description |
-|---|---|---|
-| `JWT_SECRET` | (auto-generated) | Secret key for signing JWTs — **must** be set in production |
-| `AI_SERVICE_URL` | `http://localhost:8000` | URL of the AI microservice |
-| `PORT` | `8080` | Server port |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated allowed frontend origins |
-
-### AI Service (`civiclens-ai`)
-| Variable | Default | Description |
-|---|---|---|
-| `HF_API_TOKEN` | *(required)* | HuggingFace API token ([get one free](https://huggingface.co/settings/tokens)) |
-| `HOST` | `0.0.0.0` | Server bind address |
-| `PORT` | `8000` | Server port |
-
-### Frontend (`civiclens-frontend`)
-| Variable | Default | Description |
-|---|---|---|
-| `VITE_API_URL` | `https://civiclens-backend-j5q2.onrender.com` | Backend API URL |
+The backend auto-seeds 7 amendments, 220+ comments, and 20 test users on first start. See [scripts/README.md](scripts/README.md) for details on the dataset.
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────┐     ┌──────────────────────┐
-│   React Frontend    │────▶│  Spring Boot Backend │
-│   (Vercel)          │     │  (Render)            │
-└─────────────────────┘     └──────────┬───────────┘
-         ▲                             │
-         │                             ▼
-┌─────────────────────┐     ┌──────────────────────┐
-│   Expo Mobile App   │     │  Python AI Service   │
-│   (WebView)         │     │  (Render)            │
-└─────────────────────┘     └──────────────────────┘
-                                       │
-                                       ▼
-                            ┌──────────────────────┐
-                            │  HuggingFace API     │
-                            │  (Cloud Inference)   │
-                            └──────────────────────┘
+React Frontend (Vercel)  ──>  Spring Boot API (Render)  ──>  FastAPI AI Service (Render)
+                                                                      │
+Expo Mobile App ─────────────────────┘                     HuggingFace Inference API
 ```
 
 ---
 
-## Security
+## Environment Variables
 
-- **Authentication** — JWT-based with BCrypt password hashing
-- **CORS** — Strict origin allowlisting (only configured frontend domains)
-- **Role-based access** — Admin and User roles enforced at API and route level
-- **Environment secrets** — All sensitive values (JWT secret, API tokens) are loaded from environment variables, never hardcoded in source
-- **`.env` files** — Excluded from version control via `.gitignore`; only `.env.example` templates are committed
-- **Dependencies** — Pinned to tested version ranges to prevent supply-chain drift
-
-> 🔒 If you fork this project, immediately rotate all secrets and API tokens. Never commit `.env` files or credentials to Git.
+| Variable | Where | Description |
+|---|---|---|
+| `JWT_SECRET` | Backend | JWT signing key |
+| `AI_SERVICE_URL` | Backend | URL of the AI service (default: `http://localhost:8000`) |
+| `CORS_ALLOWED_ORIGINS` | Backend | Allowed frontend URLs |
+| `HF_API_TOKEN` | AI Service | HuggingFace API token (required) |
+| `VITE_API_URL` | Frontend | Backend URL |
 
 ---
 
-## License
-
-This project was developed as an academic project.
