@@ -28,6 +28,14 @@ public class Comment {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+    @Column(name = "upvote_count", nullable = false)
+    @Builder.Default
+    private int upvoteCount = 0;
+
+    @Column(name = "downvote_count", nullable = false)
+    @Builder.Default
+    private int downvoteCount = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

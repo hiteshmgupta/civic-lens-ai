@@ -63,9 +63,9 @@ public class AnalyticsService {
 
         AiAnalysisResponse aiResponse = aiServiceClient.analyze(aiRequest);
 
-        // Calculate controversy index components
-        int upvotes = voteRepository.countUpvotesByAmendmentId(amendmentId);
-        int downvotes = voteRepository.countDownvotesByAmendmentId(amendmentId);
+        // Calculate controversy index components using cached counts on Comment
+        int upvotes = comments.stream().mapToInt(Comment::getUpvoteCount).sum();
+        int downvotes = comments.stream().mapToInt(Comment::getDownvoteCount).sum();
         int totalComments = comments.size();
         long maxComments = amendmentRepository.count() > 0 ? commentRepository.count() / amendmentRepository.count()
                 : 1;
@@ -76,9 +76,7 @@ public class AnalyticsService {
         double[] weights = new double[comments.size()];
         for (int i = 0; i < comments.size(); i++) {
             Comment c = comments.get(i);
-            int commentUp = voteRepository.countUpvotesByCommentId(c.getId());
-            int commentDown = voteRepository.countDownvotesByCommentId(c.getId());
-            weights[i] = 1.0 + commentUp + commentDown; // Base weight 1 + total votes
+            weights[i] = 1.0 + c.getUpvoteCount() + c.getDownvoteCount(); // Base weight 1 + total votes
         }
 
         double S = calculator.sentimentVariance(sentimentScores, weights);

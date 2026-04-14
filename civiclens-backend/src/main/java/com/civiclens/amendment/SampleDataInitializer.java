@@ -5,8 +5,6 @@ import com.civiclens.comment.CommentRepository;
 import com.civiclens.user.User;
 import com.civiclens.user.UserRepository;
 import com.civiclens.user.UserRole;
-import com.civiclens.vote.Vote;
-import com.civiclens.vote.VoteRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,6 @@ public class SampleDataInitializer implements CommandLineRunner {
     private final AmendmentRepository amendmentRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final VoteRepository voteRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -71,7 +68,8 @@ public class SampleDataInitializer implements CommandLineRunner {
             List<Map<String, Object>> amendments = (List<Map<String, Object>>) dataset.get("amendments");
 
             int totalComments = 0;
-            int totalVotes = 0;
+            int totalUp = 0;
+            int totalDown = 0;
 
             for (int aIdx = 0; aIdx < amendments.size(); aIdx++) {
                 Map<String, Object> amd = amendments.get(aIdx);
@@ -87,65 +85,27 @@ public class SampleDataInitializer implements CommandLineRunner {
                         .build();
                 amendment = amendmentRepository.save(amendment);
 
-                // 4. Process comments for this amendment
+                // 4. Process comments — set vote counts directly from dataset
                 @SuppressWarnings("unchecked")
                 List<Map<String, Object>> comments = (List<Map<String, Object>>) amd.get("comments");
 
                 for (Map<String, Object> c : comments) {
                     int userIndex = ((Number) c.get("user_index")).intValue();
                     User commentUser = users.get(userIndex % users.size());
+                    int upvotes = ((Number) c.get("upvotes")).intValue();
+                    int downvotes = ((Number) c.get("downvotes")).intValue();
 
                     Comment comment = Comment.builder()
                             .amendment(amendment)
                             .user(commentUser)
                             .body((String) c.get("body"))
+                            .upvoteCount(upvotes)
+                            .downvoteCount(downvotes)
                             .build();
-                    comment = commentRepository.save(comment);
+                    commentRepository.save(comment);
                     totalComments++;
-
-                    // 5. Generate vote entities for this comment
-                    int upvotes = ((Number) c.get("upvotes")).intValue();
-                    int downvotes = ((Number) c.get("downvotes")).intValue();
-
-                    // Distribute upvotes across users (round-robin, skip comment author)
-                    int voteUserIdx = 0;
-                    for (int v = 0; v < upvotes && v < users.size() - 1; v++) {
-                        User voter = users.get(voteUserIdx % users.size());
-                        if (voter.getId().equals(commentUser.getId())) {
-                            voteUserIdx++;
-                            voter = users.get(voteUserIdx % users.size());
-                        }
-                        if (!voteRepository.existsByUserIdAndCommentId(voter.getId(), comment.getId())) {
-                            Vote vote = Vote.builder()
-                                    .user(voter)
-                                    .comment(comment)
-                                    .value((short) 1)
-                                    .build();
-                            voteRepository.save(vote);
-                            totalVotes++;
-                        }
-                        voteUserIdx++;
-                    }
-
-                    // Distribute downvotes across remaining users
-                    for (int v = 0; v < downvotes && voteUserIdx < users.size(); v++) {
-                        User voter = users.get(voteUserIdx % users.size());
-                        if (voter.getId().equals(commentUser.getId())) {
-                            voteUserIdx++;
-                            if (voteUserIdx >= users.size()) break;
-                            voter = users.get(voteUserIdx % users.size());
-                        }
-                        if (!voteRepository.existsByUserIdAndCommentId(voter.getId(), comment.getId())) {
-                            Vote vote = Vote.builder()
-                                    .user(voter)
-                                    .comment(comment)
-                                    .value((short) -1)
-                                    .build();
-                            voteRepository.save(vote);
-                            totalVotes++;
-                        }
-                        voteUserIdx++;
-                    }
+                    totalUp += upvotes;
+                    totalDown += downvotes;
                 }
 
                 log.info("Seeded amendment '{}' with {} comments",
@@ -153,8 +113,8 @@ public class SampleDataInitializer implements CommandLineRunner {
                         comments.size());
             }
 
-            log.info("Dataset seeding complete: {} amendments, {} comments, {} votes",
-                    amendments.size(), totalComments, totalVotes);
+            log.info("Dataset seeding complete: {} amendments, {} comments, {} upvotes, {} downvotes",
+                    amendments.size(), totalComments, totalUp, totalDown);
 
         } catch (Exception e) {
             log.error("Failed to seed dataset from fcc_dataset.json: {}", e.getMessage(), e);

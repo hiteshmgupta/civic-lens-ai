@@ -51,8 +51,8 @@ public class AnalyticsSyncService {
 
     public boolean isRefreshNeeded(Long amendmentId) {
         int totalComments = commentRepository.countByAmendmentId(amendmentId);
-        int upvotes = voteRepository.countUpvotesByAmendmentId(amendmentId);
-        int downvotes = voteRepository.countDownvotesByAmendmentId(amendmentId);
+        int upvotes = commentRepository.sumUpvotesByAmendmentId(amendmentId);
+        int downvotes = commentRepository.sumDownvotesByAmendmentId(amendmentId);
         int totalVotes = upvotes + downvotes;
 
         Optional<AmendmentAnalytics> analyticsOpt = analyticsRepository.findByAmendmentId(amendmentId);

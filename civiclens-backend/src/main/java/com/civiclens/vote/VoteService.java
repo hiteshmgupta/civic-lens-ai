@@ -49,11 +49,25 @@ public class VoteService {
             if (vote.getValue() == request.getValue()) {
                 // Same vote = toggle off (remove)
                 voteRepository.delete(vote);
+                if (vote.getValue() == 1) {
+                    comment.setUpvoteCount(Math.max(0, comment.getUpvoteCount() - 1));
+                } else {
+                    comment.setDownvoteCount(Math.max(0, comment.getDownvoteCount() - 1));
+                }
+                commentRepository.save(comment);
                 log.info("Vote removed: user={}, comment={}", user.getId(), commentId);
             } else {
-                // Different vote = update
+                // Different vote = update (swap counts)
+                if (vote.getValue() == 1) {
+                    comment.setUpvoteCount(Math.max(0, comment.getUpvoteCount() - 1));
+                    comment.setDownvoteCount(comment.getDownvoteCount() + 1);
+                } else {
+                    comment.setDownvoteCount(Math.max(0, comment.getDownvoteCount() - 1));
+                    comment.setUpvoteCount(comment.getUpvoteCount() + 1);
+                }
                 vote.setValue(request.getValue());
                 voteRepository.save(vote);
+                commentRepository.save(comment);
                 log.info("Vote changed: user={}, comment={}, value={}", user.getId(), commentId,
                         request.getValue());
             }
@@ -64,6 +78,12 @@ public class VoteService {
                     .value(request.getValue())
                     .build();
             voteRepository.save(vote);
+            if (request.getValue() == 1) {
+                comment.setUpvoteCount(comment.getUpvoteCount() + 1);
+            } else {
+                comment.setDownvoteCount(comment.getDownvoteCount() + 1);
+            }
+            commentRepository.save(comment);
             log.info("Vote cast: user={}, comment={}, value={}", user.getId(), commentId, request.getValue());
         }
 
@@ -78,9 +98,17 @@ public class VoteService {
         Vote vote = voteRepository.findByUserIdAndCommentId(user.getId(), commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vote not found"));
 
+        Comment comment = vote.getComment();
+        if (vote.getValue() == 1) {
+            comment.setUpvoteCount(Math.max(0, comment.getUpvoteCount() - 1));
+        } else {
+            comment.setDownvoteCount(Math.max(0, comment.getDownvoteCount() - 1));
+        }
+
         voteRepository.delete(vote);
+        commentRepository.save(comment);
         log.info("Vote removed: user={}, comment={}", user.getId(), commentId);
-        queueAnalyticsRefreshAfterCommit(vote.getComment().getAmendment().getId(), "vote-remove");
+        queueAnalyticsRefreshAfterCommit(comment.getAmendment().getId(), "vote-remove");
     }
 
     private void queueAnalyticsRefreshAfterCommit(Long amendmentId, String reason) {

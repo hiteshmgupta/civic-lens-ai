@@ -30,7 +30,7 @@ public class AdminService {
         long closedAmendments = amendmentRepository.countByStatus(AmendmentStatus.CLOSED);
         long totalUsers = userRepository.count();
         long totalComments = commentRepository.count();
-        long totalVotes = voteRepository.count();
+        long totalVotes = commentRepository.sumAllUpvotes() + commentRepository.sumAllDownvotes();
 
         // All analytics records
         List<AmendmentAnalytics> allAnalytics = analyticsRepository.findAll();
@@ -92,7 +92,7 @@ public class AdminService {
 
         Map<String, Long> votesByMonth = new LinkedHashMap<>();
         try {
-            List<Object[]> voteCounts = voteRepository.countGroupedByMonth();
+            List<Object[]> voteCounts = commentRepository.sumVotesGroupedByMonth();
             for (Object[] row : voteCounts) {
                 String period = String.valueOf(row[0]);
                 Long count = ((Number) row[1]).longValue();

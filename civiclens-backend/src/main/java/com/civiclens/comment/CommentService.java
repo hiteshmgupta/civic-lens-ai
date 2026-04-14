@@ -73,14 +73,12 @@ public class CommentService {
     }
 
     private CommentResponse toResponse(Comment c) {
-        int up = voteRepository.countUpvotesByCommentId(c.getId());
-        int down = voteRepository.countDownvotesByCommentId(c.getId());
         return CommentResponse.builder()
                 .id(c.getId())
                 .body(c.getBody())
                 .username(c.getUser().getUsername())
-                .upvotes(up)
-                .downvotes(down)
+                .upvotes(c.getUpvoteCount())
+                .downvotes(c.getDownvoteCount())
                 .createdAt(c.getCreatedAt())
                 .build();
     }
